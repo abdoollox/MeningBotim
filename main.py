@@ -47,8 +47,8 @@ async def test_link_cmd(message: types.Message):
 async def send_invoice(callback: types.CallbackQuery):
     await bot.send_invoice(
         chat_id=callback.from_user.id,
-        title="Guruhga kirish",
-        description="Hub guruhiga bir martalik havola",
+        title="Garri Potter Cinema",
+        description="Garri Potter olamining barcha kolleksiyasi jamlangan guruhga kirish uchun bir martalik to'lovni amalga oshiring!",
         payload="hub_tolov",
         provider_token="", 
         currency="XTR",
@@ -95,3 +95,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
