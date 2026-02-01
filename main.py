@@ -67,10 +67,21 @@ async def pre_checkout(query: types.PreCheckoutQuery):
 @dp.message(F.successful_payment)
 async def success_payment(message: types.Message):
     try:
+        # 1. Link yaratamiz
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
-        await message.answer(f"✅ To'lov qabul qilindi!\nHavola: {link.invite_link}")
+        
+        # 2. Siz xohlagan chiroyli matnni tayyorlaymiz
+        javob_matni = (
+            "✅ To'lov qabul qilindi!\n"
+            "❕ Bu havola faqat bir kishi uchun amal qiladi!\n"
+            f"🔗 Havola: {link.invite_link}"
+        )
+        
+        # 3. Foydalanuvchiga yuboramiz
+        await message.answer(javob_matni)
+        
     except Exception as e:
-        await message.answer(f"Xatolik: {e}")
+        await message.answer(f"Xatolik yuz berdi: {e}")
 
 # --- RENDER UCHUN VEB-SERVER QISMI (YANGI) ---
 async def health_check(request):
@@ -99,6 +110,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
