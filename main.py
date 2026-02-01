@@ -46,11 +46,14 @@ async def test_link_cmd(message: types.Message):
 
 @dp.callback_query(F.data == "tulov_qilish")
 async def send_invoice(callback: types.CallbackQuery):
+    # Har safar unikal ID yaratish uchun vaqtdan foydalanamiz
+    yangi_payload = f"hub_tolov_{int(time.time())}"
+    
     await bot.send_invoice(
         chat_id=callback.from_user.id,
         title="Garri Potter Cinema",
         description="Garri Potter olamining barcha kolleksiyasi jamlangan guruhga kirish uchun bir martalik to'lovni amalga oshiring!",
-        payload=yangi_payload,
+        payload=yangi_payload,  # <--- O'ZGARGAN JOYI SHU
         provider_token="", 
         currency="XTR",
         prices=[LabeledPrice(label="Kirish", amount=NARX)]
@@ -96,5 +99,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
