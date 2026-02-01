@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import sys
+import time  # <--- MANA SHU YANGI QO'SHILDI
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
@@ -49,7 +50,7 @@ async def send_invoice(callback: types.CallbackQuery):
         chat_id=callback.from_user.id,
         title="Garri Potter Cinema",
         description="Garri Potter olamining barcha kolleksiyasi jamlangan guruhga kirish uchun bir martalik to'lovni amalga oshiring!",
-        payload="hub_tolov",
+        payload=yangi_payload,
         provider_token="", 
         currency="XTR",
         prices=[LabeledPrice(label="Kirish", amount=NARX)]
@@ -95,4 +96,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
