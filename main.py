@@ -45,7 +45,7 @@ async def send_card_info(callback: types.CallbackQuery):
         f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
         "❗️ To'lov qilganingizdan so'ng, chekni (rasm yoki fayl ko'rinishida) shu yerga yuboring.\n\n"
         "⏳ **Diqqat:** To'lovlarni tekshirish navbat bilan amalga oshiriladi. Javob olish **8 soatgacha** vaqt olishi mumkin. Iltimos, sabr qiling.\n\n"
-        "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!""
+        "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!"
     )
     await callback.message.answer(matn, parse_mode="Markdown")
     await callback.answer()
@@ -140,6 +140,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
