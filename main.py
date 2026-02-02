@@ -41,7 +41,7 @@ async def send_card_info(callback: types.CallbackQuery):
     matn = (
         f"💳 **To'lov uchun karta:**\n"
         f"`{KARTA_RAQAM}`\n"
-        f"👤 {KARTA_EGA}\n\n"
+        f"{KARTA_EGA}\n\n"
         f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
         "❗️ To'lov qilganingizdan so'ng, to'lov chekini (skrinshot) shu yerga yuboring.\n"
         "Men uni tekshirib, sizga kirish havolasini beraman."
@@ -128,4 +128,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
