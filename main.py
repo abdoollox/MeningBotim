@@ -11,7 +11,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 API_TOKEN = '8544270521:AAELBt_yuonOegOF-nPl-nI2FH7fQ-JBwQE' 
 GURUH_ID = -1003369300068  # Guruh ID si
 ADMIN_ID = 7566631808      # SIZNING ID RAQAMINGIZ (Bot sizga chek yuborishi uchun)
-KARTA_RAQAM = "5614 6814 0351 0260 (KARIMBERDIYEV ABDULLOH)" # Karta raqamingiz
+KARTA_RAQAM = "5614 6814 0351 0260"  # Faqat raqamlar
+KARTA_EGA = "KARIMBERDIYEV ABDULLOH" # Faqat ism
 MAHSULOT_NARXI = "50 000 so'm"
 
 # Botni sozlash
@@ -35,12 +36,17 @@ async def cmd_start(message: types.Message):
 # 2. "Sotib olish" bosilganda -> Karta raqam berish
 @dp.callback_query(F.data == "karta_bilan_tolash")
 async def send_card_info(callback: types.CallbackQuery):
+    # E'tibor bering: Karta raqamni ` ` belgilari ichiga oldik. 
+    # Bu uni nusxalash uchun qulay qiladi.
     matn = (
-        f"💳 **To'lov uchun karta:**\n`{KARTA_RAQAM}`\n\n"
+        f"💳 **To'lov uchun karta:**\n"
+        f"`{KARTA_RAQAM}`\n"
+        f"👤 {KARTA_EGA}\n\n"
         f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
         "❗️ To'lov qilganingizdan so'ng, to'lov chekini (skrinshot) shu yerga yuboring.\n"
         "Men uni tekshirib, sizga kirish havolasini beraman."
     )
+    # parse_mode="Markdown" turgani muhim!
     await callback.message.answer(matn, parse_mode="Markdown")
     await callback.answer()
 
@@ -122,3 +128,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
