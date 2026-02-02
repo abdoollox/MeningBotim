@@ -2,115 +2,123 @@ import asyncio
 import logging
 import os
 import sys
-import time  # <--- MANA SHU YANGI QO'SHILDI
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
-from aiogram.types import LabeledPrice, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # --- SOZLAMALAR ---
-# Tokenni xavfsizlik uchun to'g'ridan-to'g'ri yozish o'rniga Environment dan olamiz
-# Yoki shu yerga qo'shtirnoq ichida yozib qo'ying: 'SIZNING_TOKENINGIZ'
 API_TOKEN = '8544270521:AAELBt_yuonOegOF-nPl-nI2FH7fQ-JBwQE' 
-GURUH_ID = -1003369300068 # O'ZINGIZNING GURUH ID
-NARX = 1
+GURUH_ID = -1003369300068  # Guruh ID si
+ADMIN_ID = 7566631808      # SIZNING ID RAQAMINGIZ (Bot sizga chek yuborishi uchun)
+KARTA_RAQAM = "5614 6814 0351 0260 (KARIMBERDIYEV ABDULLOH)" # Karta raqamingiz
+MAHSULOT_NARXI = "50 000 so'm"
 
 # Botni sozlash
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# --- BOT FUNKSIYALARI ---
-
+# 1. Start bosilganda (Video/Rasm va Tugma)
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    # Rasm yoki Video ID si (O'zingiznikini qo'ying)
-    MEDIA_ID = "AgACAgIAAxkBAAIC..." 
+    MEDIA_ID = "AgACAgIAAxkBAAIC..." # O'zingizdagi Rasm yoki Video ID
 
     tugma = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=f"Sotib olish ({NARX} ⭐️)", callback_data="tulov_qilish")]
+        [InlineKeyboardButton(text=f"Sotib olish ({MAHSULOT_NARXI})", callback_data="karta_bilan_tolash")]
     ])
     
-    # Agar media bo'lmasa, matn chiqaradi
     try:
-        await message.answer_video(video=MEDIA_ID, caption="Mahsulot haqida ma'lumot:", reply_markup=tugma)
+        await message.answer_photo(photo=MEDIA_ID, caption="Mahsulot haqida ma'lumot. Sotib olish uchun tugmani bosing:", reply_markup=tugma)
     except:
-        await message.answer("Mahsulot haqida ma'lumot. Sotib olish uchun bosing:", reply_markup=tugma)
+        await message.answer("Mahsulot haqida ma'lumot. Sotib olish uchun tugmani bosing:", reply_markup=tugma)
 
-@dp.message(Command("test_link"))
-async def test_link_cmd(message: types.Message):
-    try:
-        link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
-        await message.answer(f"✅ Tizim ishlayapti! Link:\n{link.invite_link}")
-    except Exception as e:
-        await message.answer(f"❌ Xatolik: {e}")
-
-@dp.callback_query(F.data == "tulov_qilish")
-async def send_invoice(callback: types.CallbackQuery):
-    # Har safar unikal ID yaratish uchun vaqtdan foydalanamiz
-    yangi_payload = f"hub_tolov_{int(time.time())}"
-    
-    await bot.send_invoice(
-        chat_id=callback.from_user.id,
-        title="Garri Potter Cinema",
-        description="Garri Potter olamining barcha kolleksiyasi jamlangan guruhga kirish uchun bir martalik to'lovni amalga oshiring!",
-        payload=yangi_payload,  # <--- O'ZGARGAN JOYI SHU
-        provider_token="", 
-        currency="XTR",
-        prices=[LabeledPrice(label="Kirish", amount=NARX)]
+# 2. "Sotib olish" bosilganda -> Karta raqam berish
+@dp.callback_query(F.data == "karta_bilan_tolash")
+async def send_card_info(callback: types.CallbackQuery):
+    matn = (
+        f"💳 **To'lov uchun karta:**\n`{KARTA_RAQAM}`\n\n"
+        f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
+        "❗️ To'lov qilganingizdan so'ng, to'lov chekini (skrinshot) shu yerga yuboring.\n"
+        "Men uni tekshirib, sizga kirish havolasini beraman."
     )
+    await callback.message.answer(matn, parse_mode="Markdown")
     await callback.answer()
 
-@dp.pre_checkout_query()
-async def pre_checkout(query: types.PreCheckoutQuery):
-    await bot.answer_pre_checkout_query(query.id, ok=True)
+# 3. Foydalanuvchi Rasm (Chek) yuborganda
+@dp.message(F.photo)
+async def check_receipt(message: types.Message):
+    # Rasmni Adminga (Sizga) yuborish
+    user_id = message.from_user.id
+    username = message.from_user.username or "Noma'lum"
+    
+    # Admin uchun tugmalar (Tasdiqlash yoki Rad etish)
+    admin_tugma = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"confirm_{user_id}"),
+            InlineKeyboardButton(text="❌ Rad etish", callback_data=f"reject_{user_id}")
+        ]
+    ])
+    
+    await bot.send_photo(
+        chat_id=ADMIN_ID,
+        photo=message.photo[-1].file_id,
+        caption=f"📩 **Yangi to'lov cheki!**\n👤 Kimdan: @{username} (ID: {user_id})\n\nTasdiqlaysizmi?",
+        reply_markup=admin_tugma
+    )
+    
+    await message.answer("⏳ Chek qabul qilindi! Admin tasdiqlashi bilan sizga havola yuboriladi.")
 
-@dp.message(F.successful_payment)
-async def success_payment(message: types.Message):
+# 4. Admin "✅ Tasdiqlash"ni bosganda
+@dp.callback_query(F.data.startswith("confirm_"))
+async def confirm_payment(callback: types.CallbackQuery):
+    # Callbackdan user_id ni ajratib olish (confirm_12345 -> 12345)
+    mijoz_id = int(callback.data.split("_")[1])
+    
     try:
-        # 1. Link yaratamiz
+        # 1. Link yaratish
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
         
-        # 2. Siz xohlagan chiroyli matnni tayyorlaymiz
-        javob_matni = (
-            "✅ To'lov qabul qilindi!\n"
-            "❕ Bu havola faqat bir kishi uchun amal qiladi!\n"
-            f"🔗 Havola: {link.invite_link}"
+        # 2. Mijozga yuborish
+        success_text = (
+            "✅ **To'lov tasdiqlandi!**\n"
+            "Guruhga qo'shilish uchun maxsus havola:\n"
+            f"{link.invite_link}\n\n"
+            "Eslatma: Bu havola faqat bir marta ishlaydi."
         )
+        await bot.send_message(chat_id=mijoz_id, text=success_text)
         
-        # 3. Foydalanuvchiga yuboramiz
-        await message.answer(javob_matni)
+        # 3. Adminga xabar
+        await callback.message.edit_caption(caption=f"✅ {callback.message.caption}\n\n**TASDIQLANDI**")
         
     except Exception as e:
-        await message.answer(f"Xatolik yuz berdi: {e}")
+        await callback.message.answer(f"Xatolik: {e}")
 
-# --- RENDER UCHUN VEB-SERVER QISMI (YANGI) ---
+# 5. Admin "❌ Rad etish"ni bosganda
+@dp.callback_query(F.data.startswith("reject_"))
+async def reject_payment(callback: types.CallbackQuery):
+    mijoz_id = int(callback.data.split("_")[1])
+    
+    await bot.send_message(chat_id=mijoz_id, text="❌ To'lovingiz rad etildi yoki chek noto'g'ri. Iltimos, qayta tekshiring yoki adminga yozing.")
+    await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI**")
+
+# --- RENDER UCHUN VEB-SERVER (O'ZGARISHSIZ) ---
 async def health_check(request):
-    return web.Response(text="Bot ishlab turibdi!")
+    return web.Response(text="Bot ishlamoqda!")
 
 async def start_web_server():
     app = web.Application()
     app.router.add_get('/', health_check)
     runner = web.AppRunner(app)
     await runner.setup()
-    # Render avtomatik beradigan PORT ni olamiz yoki 8080 ni ishlatamiz
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
-    logging.info(f"Veb-server {port}-portda ishga tushdi")
 
-# --- ASOSIY ISHGA TUSHIRISH ---
+# --- ASOSIY ---
 async def main():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    
-    # 1. Veb-serverni ishga tushiramiz (Render "Port scan timeout" bermasligi uchun)
     await start_web_server()
-    
-    # 2. Botni ishga tushiramiz
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
