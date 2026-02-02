@@ -43,21 +43,19 @@ async def send_card_info(callback: types.CallbackQuery):
         f"`{KARTA_RAQAM}`\n"
         f"{KARTA_EGA}\n\n"
         f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
-        "❗️ To'lov qilganingizdan so'ng, to'lov chekini (skrinshot) shu yerga yuboring.\n"
-        "Men uni tekshirib, sizga kirish havolasini beraman."
+        "❗️ To'lov qilganingizdan so'ng, chekni (rasm yoki fayl ko'rinishida) shu yerga yuboring.\n\n"
+        "⏳ **Diqqat:** To'lovlarni tekshirish navbat bilan amalga oshiriladi. Javob olish **8 soatgacha** vaqt olishi mumkin. Iltimos, sabr qiling."
     )
-    # parse_mode="Markdown" turgani muhim!
     await callback.message.answer(matn, parse_mode="Markdown")
     await callback.answer()
 
-# 3. Foydalanuvchi Rasm (Chek) yuborganda
-@dp.message(F.photo)
+# 3. Foydalanuvchi Rasm YOKI Fayl yuborganda
+@dp.message(F.photo | F.document) # <--- O'zgargan joyi: Ikkalasini ham qabul qiladi
 async def check_receipt(message: types.Message):
-    # Rasmni Adminga (Sizga) yuborish
     user_id = message.from_user.id
     username = message.from_user.username or "Noma'lum"
     
-    # Admin uchun tugmalar (Tasdiqlash yoki Rad etish)
+    # Admin uchun tugmalar
     admin_tugma = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"confirm_{user_id}"),
@@ -65,14 +63,27 @@ async def check_receipt(message: types.Message):
         ]
     ])
     
-    await bot.send_photo(
-        chat_id=ADMIN_ID,
-        photo=message.photo[-1].file_id,
-        caption=f"📩 **Yangi to'lov cheki!**\n👤 Kimdan: @{username} (ID: {user_id})\n\nTasdiqlaysizmi?",
-        reply_markup=admin_tugma
-    )
+    caption_text = f"📩 **Yangi to'lov cheki!**\n👤 Kimdan: @{username} (ID: {user_id})\n\nTasdiqlaysizmi?"
+
+    # Agar foydalanuvchi RASM yuborgan bo'lsa:
+    if message.photo:
+        await bot.send_photo(
+            chat_id=ADMIN_ID,
+            photo=message.photo[-1].file_id,
+            caption=caption_text,
+            reply_markup=admin_tugma
+        )
     
-    await message.answer("⏳ Chek qabul qilindi! Admin tasdiqlashi bilan sizga havola yuboriladi.")
+    # Agar foydalanuvchi FAYL (Document) yuborgan bo'lsa:
+    elif message.document:
+        await bot.send_document(
+            chat_id=ADMIN_ID,
+            document=message.document.file_id,
+            caption=caption_text,
+            reply_markup=admin_tugma
+        )
+    
+    await message.answer("⏳ Chek qabul qilindi! Adminlar tekshirib chiqishgach (8 soat ichida) sizga havola yuboriladi.")
 
 # 4. Admin "✅ Tasdiqlash"ni bosganda
 @dp.callback_query(F.data.startswith("confirm_"))
@@ -128,5 +139,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
