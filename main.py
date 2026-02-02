@@ -10,7 +10,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, BufferedIn
 from PIL import Image, ImageDraw, ImageFont  # <--- YANGI: Rasm chizish uchun
 
 # --- SOZLAMALAR ---
-API_TOKEN = '8544270521:AAELBt_yuonOegOF-nPl-nI2FH7fQ-JBwQE' 
+API_TOKEN = '8544270521:AAFHqHVqY9ZuhfsdY5vfhVu5DtsP6Pz_MWU' 
 GURUH_ID = -1003369300068  # Guruh ID
 ADMIN_ID = 7566631808      # Admin ID
 KARTA_RAQAM = "5614 6814 0351 0260"
@@ -30,7 +30,7 @@ def rasm_yaratish(ism):
         
         # 2. Shriftni yuklaymiz (O'lchamini rasmga qarab to'g'irlash kerak bo'lishi mumkin)
         # size=60 degan joyini kattaroq yoki kichikroq qilib ko'rasiz
-        font = ImageFont.truetype("assets/font.ttf", size=60)
+        font = ImageFont.truetype("assets/font.TTF", size=60)
         
         # 3. Matnni o'rtaga joylashtirish hisob-kitobi
         # Rasmning o'lchamlari
@@ -178,3 +178,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
