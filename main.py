@@ -125,7 +125,7 @@ async def confirm_payment(callback: types.CallbackQuery):
         # 2. Mijozga xabar yuboramiz
         await bot.send_message(
             chat_id=user_id,
-            text="✅ **To'lov tasdiqlandi!**\n\nIltimos, Hogwarts xatiga yozishimiz uchun **Ism va Familiyangizni** yozib yuboring.\n\n*Misol: Aliyev Vali*",
+            text="✅ **To'lov tasdiqlandi!**\n\nIltimos, Hogwarts xatiga yozishimiz uchun **Ism va Familiyangizni** yozib yuboring.\n\n*Misol: Abdulloh Karimberdiyev*",
             parse_mode="Markdown"
         )
         
@@ -215,6 +215,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
