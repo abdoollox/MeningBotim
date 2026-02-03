@@ -251,6 +251,12 @@ async def start_web_server():
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
 
+# --- VAQTINCHA: VIDEO ID OLSISH ---
+@dp.message(F.video)
+async def id_olish(message: types.Message):
+    # Bu kod faqat videoning ASL nusxasi ID sini olib beradi
+    await message.reply(f"✅ MANA BU HAKIQIY VIDEO ID:\n`{message.video.file_id}`", parse_mode="Markdown")
+
 async def main():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     await start_web_server()
@@ -258,6 +264,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
