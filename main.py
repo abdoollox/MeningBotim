@@ -97,7 +97,6 @@ async def cmd_muggle_start(message: types.Message):
     except:
         await message.answer(caption_text, reply_markup=tugma, parse_mode="Markdown")
 
---- QO'SHIMCHA: Tugma bosilganda ---
 @dp.callback_query(F.data == "alohomora_action")
 async def alohomora_tugma_bosildi(callback: types.CallbackQuery):
     # 1. Tugma bosilganini bildiramiz (Loading aylanib qolmasligi uchun)
@@ -334,5 +333,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
