@@ -22,7 +22,7 @@ MAHSULOT_NARXI = "50 000 so'm"
 
 # Rasmlar va Videolar ID lari (Bularni botga rasm tashlab, ID sini olib o'zgartirasiz)
 LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0RJaTX9PAEAAwIAA3gAAzgE" # Qulflangan chemodan ID si
-OPENED_IMG_ID = "AgACAgIAAxkBAAEg3zlpggp59M9YVLTBP0qRtNhhCrcaNwAC2BBrG9UyEEjTE0sWTmQYZQEAAwIAA3kAAzgE" # Ochilgan chemodan ID si
+OPENED_IMG_ID = "AgACAgIAAxkBAAEg3zlpggp59M9YVLTBP0qRtNhhCrcaNwAC2BBrG9UyEEjTE0sWTmQYZQEAAwIAA3gAAzgE" # Ochilgan chemodan ID si
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
 
 # Botni sozlash
@@ -97,11 +97,16 @@ async def cmd_muggle_start(message: types.Message):
     except:
         await message.answer(caption_text, reply_markup=tugma, parse_mode="Markdown")
 
-# --- QO'SHIMCHA: Tugma bosilganda ham ishlasin ---
+--- QO'SHIMCHA: Tugma bosilganda ---
 @dp.callback_query(F.data == "alohomora_action")
 async def alohomora_tugma_bosildi(callback: types.CallbackQuery):
-    await callback.message.delete() # Eski xabarni o'chiramiz
-    # To'g'ridan-to'g'ri 2-qadam funksiyasini chaqiramiz (o'zini message objecti bilan)
+    # 1. Tugma bosilganini bildiramiz (Loading aylanib qolmasligi uchun)
+    await callback.answer("Sehr ishlamoqda... ✨")
+    
+    # 2. Eski xabarni O'CHIRMAYMIZ (delete ni olib tashladik)
+    
+    # 3. Yangi xabarni yuboramiz
+    # Bu funksiya yangi rasm (Ochilgan chemodan) yuboradi
     await cmd_open_suitcase(callback.message)
 
 # --- 2-QADAM: ALOHOMORA (Chemodanni ochish) ---
@@ -329,4 +334,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
