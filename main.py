@@ -16,6 +16,7 @@ ADMIN_ID = 7566631808      # Admin ID
 KARTA_RAQAM = "5614 6814 0351 0260"
 KARTA_EGA = "KARIMBERDIYEV ABDULLOH"
 MAHSULOT_NARXI = "50 000 so'm"
+RAD_ETISH_VIDEO_ID = "BAADAgAD..."
 
 # Botni sozlash
 bot = Bot(token=API_TOKEN)
@@ -141,8 +142,25 @@ async def confirm_payment(callback: types.CallbackQuery):
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_payment(callback: types.CallbackQuery):
     user_id = int(callback.data.split("_")[1])
-    await bot.send_message(user_id, "❌ To'lov rad etildi. Chekda muammo bor.")
-    await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI**")
+    
+    rad_etish_matni = (
+        "🏦 Gringotts Banki xabarnomasi\n\n"
+        
+        "Afsuski, bu chek qalbakiga o'xshaydi yoki unda xatolik bor. "
+        "Goblinlar uni qabul qilishmadi. 🙅‍♂️\n\n"
+        
+        "Iltimos, qaytadan tekshirib, to'g'ri chekni yuboring."
+    )
+    
+    # VIDEO YUBORISH
+    await bot.send_video(
+        chat_id=user_id,
+        video=RAD_ETISH_VIDEO_ID,
+        caption=rad_etish_matni,
+        parse_mode="Markdown"
+    )
+    
+    await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI (Video yuborildi)**")
 
 # --- YANGI FUNKSIYA: Ismni qabul qilish va Tugma bilan yuborish ---
 @dp.message(F.text)
@@ -230,6 +248,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
