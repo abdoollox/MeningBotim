@@ -114,42 +114,54 @@ async def confirm_payment(callback: types.CallbackQuery):
     try:
         user_id = int(callback.data.split("_")[1])
         
-        # 1. Mijoz haqida ma'lumotni Telegramdan qayta so'raymiz (Ismini aniq bilish uchun)
+        # 1. Mijoz haqida ma'lumot
         try:
             chat_info = await bot.get_chat(user_id)
             mijoz_ismi = chat_info.first_name or "Talaba"
         except:
             mijoz_ismi = "Talaba"
 
-        # 2. RASM CHIZAMIZ (Mijoz ismi bilan)
+        # 2. RASM CHIZAMIZ
         xat_rasmi = rasm_yaratish(mijoz_ismi)
         
         # 3. Link yaratish
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
         
-        # 4. Javob matni
+        # 4. Javob matni (HTML formatda - Xavfsiz)
+        # <b> - Qalin yozuv
+        # <i> - Kursiv yozuv
         success_caption = (
-            f"🦉 **HOGWARTS ga XUSH KELIBSIZ, {mijoz_ismi.upper()}!**\n\n"
+            f"🦉 <b>HOGWARTS ga XUSH KELIBSIZ, {mijoz_ismi.upper()}!</b>\n\n"
             "Sizning arizangiz qabul qilindi. "
             "Quyida sehrli olamga kirish chiptangiz:\n"
             f"🔗 {link.invite_link}\n\n"
-            "__Bu chipta faqat siz uchun.__"
+            "<i>Bu chipta faqat siz uchun.</i>"
         )
         
-        # 5. Yuborish (Agar rasm chizilsa rasmni, bo'lmasa oddiy xabarni)
+        # 5. Yuborish
         if xat_rasmi:
             await bot.send_photo(
                 chat_id=user_id,
                 photo=BufferedInputFile(xat_rasmi.read(), filename="xat.jpg"),
                 caption=success_caption,
-                parse_mode="Markdown"
+                parse_mode="HTML"  # <--- Markdown o'rniga HTML ishlatdik
             )
         else:
-            await bot.send_message(chat_id=user_id, text=success_caption) # Zaxira varianti
+            await bot.send_message(
+                chat_id=user_id, 
+                text=success_caption, 
+                parse_mode="HTML"
+            )
         
-        await callback.message.edit_caption(caption=f"✅ {callback.message.caption}\n\n**TASDIQLANDI (Xat yuborildi)**")
+        # 6. Adminga xabar (Buni ham HTML ga o'tkazamiz)
+        # Eski captiondagi formatni buzmaslik uchun shunchaki matn qo'shamiz
+        await callback.message.edit_caption(
+            caption=f"✅ {callback.message.caption}\n\n<b>TASDIQLANDI (Xat yuborildi)</b>",
+            parse_mode="HTML"
+        )
         
     except Exception as e:
+        # Xatolik bo'lsa adminga ko'rsatamiz
         await callback.message.answer(f"Xatolik: {e}")
 
 @dp.callback_query(F.data.startswith("reject_"))
@@ -178,4 +190,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
