@@ -64,7 +64,7 @@ def rasm_yaratish(ism):
 
 # --- BOT HANDLERLARI ---
 
-@dp.message(Command("start"))
+@dp.message(Command("star", "alohomora"))
 async def cmd_start(message: types.Message):
     tugma = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=f"Sotib olish ({MAHSULOT_NARXI})", callback_data="karta_bilan_tolash")]
@@ -264,6 +264,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
