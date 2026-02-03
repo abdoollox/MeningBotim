@@ -21,8 +21,8 @@ KARTA_EGA = "KARIMBERDIYEV ABDULLOH"
 MAHSULOT_NARXI = "50 000 so'm"
 
 # Rasmlar va Videolar ID lari (Bularni botga rasm tashlab, ID sini olib o'zgartirasiz)
-LOCKED_IMG_ID = "AgACAgIAAxkBA..." # Qulflangan chemodan ID si
-OPENED_IMG_ID = "AgACAgIAAxkBA..." # Ochilgan chemodan ID si
+LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0RJaTX9PAEAAwIAA3gAAzgE" # Qulflangan chemodan ID si
+OPENED_IMG_ID = "AgACAgIAAxkBAAEg3zlpggp59M9YVLTBP0qRtNhhCrcaNwAC2BBrG9UyEEjTE0sWTmQYZQEAAwIAA3kAAzgE" # Ochilgan chemodan ID si
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
 
 # Botni sozlash
@@ -81,18 +81,28 @@ def rasm_yaratish(ism, shablon_turi="invite"):
 async def cmd_muggle_start(message: types.Message):
     # Banner: Qulflangan chemodan
     caption_text = (
-        "🚫 **Diqqat, Magllar (Muggles)!**\n\n"
-        "Siz oddiy odamlar ko'rishi mumkin bo'lmagan sehrli chemodan qarshisidasiz.\n\n"
-        "🔒 Bu chemodan ichida **«Hogwarts Cinema»** ning eng nodir to'plamlari saqlanmoqda.\n"
-        "Uni faqat haqiqiy sehrgarlargina ochish afsuni orqali ocha oladilar.\n\n"
-        "Agar sehrgar bo'lsangiz, tayoqchangizni ishlating: /alohomora"
+        "Menimcha siz magl ya'ni oddiy odam bo'lsangiz kerak!\n\n"
+        "Sababi, chemodanni magllar ocha olmaydi. Ichida «Hogwarts Cinema» ning yashirin xazinasi bor.\n\n"
+        "🗝 Agar siz sehrgar bo‘lsangiz, qulfni ochish uchun nima qilishni bilasiz.\n\n"
     )
     
-    # Agar LOCKED_IMG_ID noto'g'ri bo'lsa, xato bermasligi uchun try-except
+    # Tugma ham qo'shamiz (Ehtiyot shart)
+    # Agar mijoz baribir tushunmasa, tugmani bossin
+    tugma = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🪄 Alohomora", callback_data="alohomora_action")]
+    ])
+    
     try:
-        await message.answer_photo(LOCKED_IMG_ID, caption=caption_text)
+        await message.answer_photo(LOCKED_IMG_ID, caption=caption_text, reply_markup=tugma, parse_mode="Markdown")
     except:
-        await message.answer(caption_text) # Rasm yo'q bo'lsa matnni o'zi boradi
+        await message.answer(caption_text, reply_markup=tugma, parse_mode="Markdown")
+
+# --- QO'SHIMCHA: Tugma bosilganda ham ishlasin ---
+@dp.callback_query(F.data == "alohomora_action")
+async def alohomora_tugma_bosildi(callback: types.CallbackQuery):
+    await callback.message.delete() # Eski xabarni o'chiramiz
+    # To'g'ridan-to'g'ri 2-qadam funksiyasini chaqiramiz (o'zini message objecti bilan)
+    await cmd_open_suitcase(callback.message)
 
 # --- 2-QADAM: ALOHOMORA (Chemodanni ochish) ---
 @dp.message(Command("alohomora"))
@@ -319,3 +329,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
