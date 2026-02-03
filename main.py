@@ -64,16 +64,40 @@ def rasm_yaratish(ism):
 
 # --- BOT HANDLERLARI ---
 
-@dp.message(Command("star", "alohomora"))
-async def cmd_start(message: types.Message):
+# --- 1. MUGGLE LAR UCHUN (YOLG'ON START) ---
+@dp.message(Command("start"))
+async def cmd_muggle_start(message: types.Message):
+    # Bu yerda hech qanday sehr yo'q. Shunchaki zerikarli xatolik.
+    await message.answer(
+        "⚠️ **Error 404: Not Found**\n\n"
+        "Server bilan aloqa yo'q. Bot vaqtincha faoliyatini to'xtatgan.\n"
+        "Iltimos, keyinroq urinib ko'ring.",
+        parse_mode="Markdown"
+    )
+
+# --- 2. SEHRGARLAR UCHUN (HAQIQIY KIRISH) ---
+@dp.message(Command("alohomora"))
+async def cmd_real_start(message: types.Message):
+    # Bu yerda boyagi "Sehrli" kodimiz ishlaydi
+    
+    # Rasm ID sini o'zingiznikiga almashtiring
+    RASHM_ID = "AgACAgIAAxkBAAIC..." 
+
     tugma = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=f"Sotib olish ({MAHSULOT_NARXI})", callback_data="karta_bilan_tolash")]
+        [InlineKeyboardButton(text="✉️ Xatni ochib o'qish", callback_data="menyu_haqida")]
     ])
+    
+    matn = (
+        "🗝 Qulf ochildi!\n\n"
+        "Xush kelibsiz, sehrgar! Siz mugglarni chalg'itib, yashirin yo'lakni topdingiz.\n\n"
+        "Bu yerda Garri Potter filmlarining eng sifatli va to'liq kolleksiyasi yig'ilgan.\n\n"
+        "Ichkarida nimalar borligini ko'rishni istaysizmi?"
+    )
+    
     try:
-        # Agar MEDIA_ID bo'lmasa, oddiy matn chiqaradi
-        await message.answer("Mahsulot haqida ma'lumot.", reply_markup=tugma)
+        await message.answer_photo(photo=RASHM_ID, caption=matn, reply_markup=tugma, parse_mode="Markdown")
     except:
-        await message.answer("Xush kelibsiz!", reply_markup=tugma)
+        await message.answer(matn, reply_markup=tugma, parse_mode="Markdown")
 
 @dp.callback_query(F.data == "karta_bilan_tolash")
 async def send_card_info(callback: types.CallbackQuery):
@@ -264,6 +288,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
