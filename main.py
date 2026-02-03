@@ -144,7 +144,7 @@ async def reject_payment(callback: types.CallbackQuery):
     await bot.send_message(user_id, "❌ To'lov rad etildi. Chekda muammo bor.")
     await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI**")
 
-# --- YANGI FUNKSIYA: Ismni qabul qilish va Xat yuborish ---
+# --- YANGI FUNKSIYA: Ismni qabul qilish va Tugma bilan yuborish ---
 @dp.message(F.text)
 async def ism_qabul_qilish(message: types.Message):
     user_id = message.from_user.id
@@ -152,44 +152,55 @@ async def ism_qabul_qilish(message: types.Message):
     # Agar bu odam to'lov qilganlar ro'yxatida bo'lsa:
     if user_id in ISM_KUTISH_ROYXATI:
         
-        # 1. Mijoz yozgan ismni olamiz
         haqiqiy_ism = message.text
         
-        # Ism juda uzun bo'lib ketmasligi uchun tekshiramiz (ixtiyoriy)
+        # Ism uzunligini tekshirish
         if len(haqiqiy_ism) > 30:
             await message.answer("Ism juda uzun! Iltimos, qisqaroq qilib (Masalan: Ism Familiya) qayta yuboring.")
             return
 
-        await message.answer("⏳ Ism qabul qilindi. Sehrli xat tayyorlanmoqda...")
+        await message.answer("⏳ Ism qabul qilindi. Sehrli xat va chipta tayyorlanmoqda...")
 
         try:
-            # 2. RASM CHIZAMIZ (Mijoz yozgan ism bilan)
+            # 1. RASM CHIZAMIZ
             xat_rasmi = rasm_yaratish(haqiqiy_ism)
             
-            # 3. Link yaratish
+            # 2. Link yaratish
             link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
             
-            # 4. Javob matni
+            # 3. LINKNI TUGMAGA JOYLASH (YANGI QISM)
+            # url=link.invite_link -> Bu tugmani bosganda guruhga olib o'tadi
+            stansiya_tugmasi = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="🚂 Platforma 9 ¾ (Kirish)", url=link.invite_link)]
+            ])
+            
+            # 4. Javob matni (Linkni olib tashladik, o'rniga ko'rsatma yozdik)
             success_caption = (
                 f"🦉 ✉️\n\n"
-                f"<b>{haqiqiy_sim}, «Garri Potter Cinema» guruhiga qabul qilindingiz!</b>\n\n"
-                f"Quyida sehrli olamga kirish chiptangiz:\n"
-                f"🔗 {link.invite_link}\n\n"
+                f"<b>{haqiqiy_ism}, «Garri Potter Cinema» guruhiga qabul qilindingiz!</b>\n\n"
+                f"Poyezd jo'nashiga oz qoldi! 🕰\n"
+                f"Guruhga qo'shilish uchun pastdagi <b>Platforma 9 ¾</b> tugmasini bosing.\n\n"
                 f"<i>🎫 Bu chipta faqat siz uchun!</i>"
             )
             
-            # 5. Yuborish
+            # 5. Yuborish (reply_markup=stansiya_tugmasi qo'shildi)
             if xat_rasmi:
                 await bot.send_photo(
                     chat_id=user_id,
                     photo=BufferedInputFile(xat_rasmi.read(), filename="xat.jpg"),
                     caption=success_caption,
+                    reply_markup=stansiya_tugmasi, # <--- Tugma shu yerda
                     parse_mode="HTML"
                 )
             else:
-                await bot.send_message(user_id, success_caption, parse_mode="HTML")
+                await bot.send_message(
+                    chat_id=user_id, 
+                    text=success_caption, 
+                    reply_markup=stansiya_tugmasi,
+                    parse_mode="HTML"
+                )
             
-            # 6. Ro'yxatdan o'chiramiz (Qayta yozsa bot javob bermasligi uchun)
+            # 6. Ro'yxatdan o'chiramiz
             ISM_KUTISH_ROYXATI.discard(user_id)
             
         except Exception as e:
@@ -215,6 +226,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
