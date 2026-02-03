@@ -143,24 +143,34 @@ async def confirm_payment(callback: types.CallbackQuery):
 async def reject_payment(callback: types.CallbackQuery):
     user_id = int(callback.data.split("_")[1])
     
-    rad_etish_matni = (
-        "🏦 Gringotts Banki xabarnomasi\n\n"
-        
+    # 1. Rad etish matni (Gringotts uslubida)
+    rad_matni = (
+        "🏦 **Gringotts Banki xabarnomasi**\n\n"
         "Afsuski, bu chek qalbakiga o'xshaydi yoki unda xatolik bor. "
         "Goblinlar uni qabul qilishmadi. 🙅‍♂️\n\n"
+        "Iltimos, qaytadan tekshirib, **haqiqiy chekni** yuboring."
+    )
+
+    try:
+        # 2. VIDEO YUBORISH (MP4)
+        await bot.send_video(
+            chat_id=user_id,
+            video=RAD_ETISH_VIDEO_ID,
+            caption=rad_matni,
+            parse_mode="Markdown"
+        )
         
-        "Iltimos, qaytadan tekshirib, to'g'ri chekni yuboring."
-    )
-    
-    # VIDEO YUBORISH
-    await bot.send_video(
-        chat_id=user_id,
-        video=RAD_ETISH_VIDEO_ID,
-        caption=rad_etish_matni,
-        parse_mode="Markdown"
-    )
-    
-    await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI (Video yuborildi)**")
+        # 3. Adminga xabar (Statusni o'zgartirish)
+        # Admin xabari HTML formatda turgani ma'qul, xato bermasligi uchun
+        await callback.message.edit_caption(
+            caption=f"❌ {callback.message.caption}\n\n<b>RAD ETILDI (Video yuborildi)</b>",
+            parse_mode="HTML"
+        )
+        
+    except Exception as e:
+        # Mabodo video ID noto'g'ri bo'lsa ham, bot to'xtab qolmasligi uchun zaxira:
+        await bot.send_message(chat_id=user_id, text=rad_matni, parse_mode="Markdown")
+        await callback.answer(f"Xatolik: Video yuborilmadi, lekin matn ketdi. {e}", show_alert=True)
 
 # --- YANGI FUNKSIYA: Ismni qabul qilish va Tugma bilan yuborish ---
 @dp.message(F.text)
@@ -248,6 +258,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
