@@ -76,7 +76,6 @@ async def send_card_info(callback: types.CallbackQuery):
         f"💳 **To'lov uchun karta:**\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
         f"💰 **Narxi:** {MAHSULOT_NARXI}\n\n"
         "❗️ Chekni rasm yoki fayl ko'rinishida yuboring.\n"
-        "⏳ Tekshirish vaqti: 8 soatgacha.\n💯 Kutganingizdan ortiq qiymat olasiz!"
     )
     await callback.message.answer(matn, parse_mode="Markdown")
     await callback.answer()
@@ -107,7 +106,9 @@ async def check_receipt(message: types.Message):
     elif message.document:
         await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
     
-    await message.answer("⏳ Chek qabul qilindi! Tez orada javob olasiz.")
+    await message.answer("⏳ Chek qabul qilindi! Tez orada javob olasiz.\n"
+                        "⏳ Tekshirish vaqti uzog'i 8 soatgacha davom etadi.\n"
+                         "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!")
 
 @dp.callback_query(F.data.startswith("confirm_"))
 async def confirm_payment(callback: types.CallbackQuery):
@@ -131,11 +132,14 @@ async def confirm_payment(callback: types.CallbackQuery):
         # <b> - Qalin yozuv
         # <i> - Kursiv yozuv
         success_caption = (
-            f"🦉 <b>HOGWARTS ga XUSH KELIBSIZ, {mijoz_ismi.upper()}!</b>\n\n"
-            "Sizning arizangiz qabul qilindi. "
+            f"🦉✉️ \n\n"
+            
+            "<b>«Garri Potter Cinema» guruhiga qabul qilindizngiz, {mijoz_ismi}!</b>\n\n"
+            
             "Quyida sehrli olamga kirish chiptangiz:\n"
             f"🔗 {link.invite_link}\n\n"
-            "<i>Bu chipta faqat siz uchun.</i>"
+            
+            "<i>🎫 Bu chipta faqat siz uchun!</i>"
         )
         
         # 5. Yuborish
@@ -190,6 +194,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
