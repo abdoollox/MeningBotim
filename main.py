@@ -42,7 +42,7 @@ def rasm_yaratish(ism):
         # Agar teparoqqa yoki pastroqqa surmoqchi bo'lsangiz:
         # (H - h) / 2 + 100  (Masalan, +100 pastga suradi)
         x_joyi = (W - w) / 2
-        y_joyi = (H - h) / 2 - 200 
+        y_joyi = (H - h) / 2 - 220 
         
         # 4. Ismni yozamiz (Rangi: Qora - "black" yoki To'q yashil - "#0b3d0b")
         draw.text((x_joyi, y_joyi), ism, font=font, fill="black")
@@ -190,5 +190,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
