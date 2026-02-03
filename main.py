@@ -128,18 +128,14 @@ async def confirm_payment(callback: types.CallbackQuery):
         # 3. Link yaratish
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
         
-        # 4. Javob matni (HTML formatda - Xavfsiz)
-        # <b> - Qalin yozuv
-        # <i> - Kursiv yozuv
+       # 4. Javob matni
+        # Har bir qator oldida 'f' bo'lishi shart!
         success_caption = (
-            f"🦉✉️ \n\n"
-            
-            "<b>«Garri Potter Cinema» guruhiga qabul qilindizngiz, {mijoz_ismi}!</b>\n\n"
-            
-            "Quyida sehrli olamga kirish chiptangiz:\n"
+            f"🦉 ✉️\n\n"
+            f"<b>«Garri Potter Cinema» guruhiga qabul qilindingiz, {mijoz_ismi}!</b>\n\n"
+            f"Quyida sehrli olamga kirish chiptangiz:\n"
             f"🔗 {link.invite_link}\n\n"
-            
-            "<i>🎫 Bu chipta faqat siz uchun!</i>"
+            f"<i>🎫 Bu chipta faqat siz uchun!</i>"
         )
         
         # 5. Yuborish
@@ -194,6 +190,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
