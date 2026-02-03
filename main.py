@@ -21,6 +21,10 @@ MAHSULOT_NARXI = "50 000 so'm"
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
+# --- YANGI QO'SHIMCHA: Ism kutish ro'yxati ---
+# Bu yerda to'lovi tasdiqlangan, lekin hali ismini yozmagan odamlar turadi
+ISM_KUTISH_ROYXATI = set()
+
 # --- YANGI FUNKSIYA: RASM CHIZISH ---
 def rasm_yaratish(ism):
     try:
@@ -115,53 +119,23 @@ async def confirm_payment(callback: types.CallbackQuery):
     try:
         user_id = int(callback.data.split("_")[1])
         
-        # 1. Mijoz haqida ma'lumot
-        try:
-            chat_info = await bot.get_chat(user_id)
-            mijoz_ismi = chat_info.first_name or "Talaba"
-        except:
-            mijoz_ismi = "Talaba"
-
-        # 2. RASM CHIZAMIZ
-        xat_rasmi = rasm_yaratish(mijoz_ismi)
+        # 1. Mijozni "Ism kutish" ro'yxatiga qo'shamiz
+        ISM_KUTISH_ROYXATI.add(user_id)
         
-        # 3. Link yaratish
-        link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
-        
-       # 4. Javob matni
-        # Har bir qator oldida 'f' bo'lishi shart!
-        success_caption = (
-            f"🦉 ✉️\n\n"
-            f"<b>«Garri Potter Cinema» guruhiga qabul qilindingiz, {mijoz_ismi}!</b>\n\n"
-            f"Quyida sehrli olamga kirish chiptangiz:\n"
-            f"🔗 {link.invite_link}\n\n"
-            f"<i>🎫 Bu chipta faqat siz uchun!</i>"
+        # 2. Mijozga xabar yuboramiz
+        await bot.send_message(
+            chat_id=user_id,
+            text="✅ **To'lov tasdiqlandi!**\n\nIltimos, Hogwarts xatiga yozishimiz uchun **Ism va Familiyangizni** yozib yuboring.\n\n*Misol: Aliyev Vali*",
+            parse_mode="Markdown"
         )
         
-        # 5. Yuborish
-        if xat_rasmi:
-            await bot.send_photo(
-                chat_id=user_id,
-                photo=BufferedInputFile(xat_rasmi.read(), filename="xat.jpg"),
-                caption=success_caption,
-                parse_mode="HTML"  # <--- Markdown o'rniga HTML ishlatdik
-            )
-        else:
-            await bot.send_message(
-                chat_id=user_id, 
-                text=success_caption, 
-                parse_mode="HTML"
-            )
-        
-        # 6. Adminga xabar (Buni ham HTML ga o'tkazamiz)
-        # Eski captiondagi formatni buzmaslik uchun shunchaki matn qo'shamiz
+        # 3. Adminga xabar (O'zgardi)
         await callback.message.edit_caption(
-            caption=f"✅ {callback.message.caption}\n\n<b>TASDIQLANDI (Xat yuborildi)</b>",
+            caption=f"✅ {callback.message.caption}\n\n<b>TASDIQLANDI. Mijozdan ism kutilmoqda...</b>",
             parse_mode="HTML"
         )
         
     except Exception as e:
-        # Xatolik bo'lsa adminga ko'rsatamiz
         await callback.message.answer(f"Xatolik: {e}")
 
 @dp.callback_query(F.data.startswith("reject_"))
@@ -169,6 +143,57 @@ async def reject_payment(callback: types.CallbackQuery):
     user_id = int(callback.data.split("_")[1])
     await bot.send_message(user_id, "❌ To'lov rad etildi. Chekda muammo bor.")
     await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n**RAD ETILDI**")
+
+# --- YANGI FUNKSIYA: Ismni qabul qilish va Xat yuborish ---
+@dp.message(F.text)
+async def ism_qabul_qilish(message: types.Message):
+    user_id = message.from_user.id
+    
+    # Agar bu odam to'lov qilganlar ro'yxatida bo'lsa:
+    if user_id in ISM_KUTISH_ROYXATI:
+        
+        # 1. Mijoz yozgan ismni olamiz
+        haqiqiy_ism = message.text
+        
+        # Ism juda uzun bo'lib ketmasligi uchun tekshiramiz (ixtiyoriy)
+        if len(haqiqiy_ism) > 30:
+            await message.answer("Ism juda uzun! Iltimos, qisqaroq qilib (Masalan: Ism Familiya) qayta yuboring.")
+            return
+
+        await message.answer("⏳ Ism qabul qilindi. Sehrli xat tayyorlanmoqda...")
+
+        try:
+            # 2. RASM CHIZAMIZ (Mijoz yozgan ism bilan)
+            xat_rasmi = rasm_yaratish(haqiqiy_ism)
+            
+            # 3. Link yaratish
+            link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
+            
+            # 4. Javob matni
+            success_caption = (
+                f"🦉 ✉️\n\n"
+                f"<b>«Garri Potter Cinema» guruhiga qabul qilindingiz, {haqiqiy_ism}!</b>\n\n"
+                f"Quyida sehrli olamga kirish chiptangiz:\n"
+                f"🔗 {link.invite_link}\n\n"
+                f"<i>🎫 Bu chipta faqat siz uchun!</i>"
+            )
+            
+            # 5. Yuborish
+            if xat_rasmi:
+                await bot.send_photo(
+                    chat_id=user_id,
+                    photo=BufferedInputFile(xat_rasmi.read(), filename="xat.jpg"),
+                    caption=success_caption,
+                    parse_mode="HTML"
+                )
+            else:
+                await bot.send_message(user_id, success_caption, parse_mode="HTML")
+            
+            # 6. Ro'yxatdan o'chiramiz (Qayta yozsa bot javob bermasligi uchun)
+            ISM_KUTISH_ROYXATI.discard(user_id)
+            
+        except Exception as e:
+            await message.answer(f"Xatolik yuz berdi: {e}")
 
 # --- VEB SERVER ---
 async def health_check(request):
@@ -190,6 +215,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
