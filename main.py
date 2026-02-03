@@ -16,7 +16,7 @@ ADMIN_ID = 7566631808      # Admin ID
 KARTA_RAQAM = "5614 6814 0351 0260"
 KARTA_EGA = "KARIMBERDIYEV ABDULLOH"
 MAHSULOT_NARXI = "50 000 so'm"
-RAD_ETISH_VIDEO_ID = "BAADAgAD..."
+RAD_ETISH_VIDEO_ID = "AAMCAgADGQEAASDdiWmBouMVnoOXfra0gNWKHPPJemplAAKGkwAC0p8QSNTbYMXeQfaMAQAHbQADOAQ"
 
 # Botni sozlash
 bot = Bot(token=API_TOKEN)
@@ -248,6 +248,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
