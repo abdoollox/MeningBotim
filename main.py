@@ -177,10 +177,14 @@ async def ism_qabul_qilish(message: types.Message):
             # 4. Javob matni (Linkni olib tashladik, o'rniga ko'rsatma yozdik)
             success_caption = (
                 f"🦉 ✉️\n\n"
+                
                 f"<b>{haqiqiy_ism}, «Garri Potter Cinema» guruhiga qabul qilindingiz!</b>\n\n"
-                f"Poyezd jo'nashiga oz qoldi! 🕰\n"
-                f"Guruhga qo'shilish uchun pastdagi <b>Platforma 9 ¾</b> tugmasini bosing.\n\n"
-                f"<i>🎫 Bu chipta faqat siz uchun!</i>"
+
+                f"🎫 Bu chipta faqat siz uchun!\n\n"
+                
+                f"🕰 Poyezd jo'nashiga oz qoldi!\n\n"
+                
+                f"👇 Guruhga qo'shilish uchun pastdagi <b>Platforma 9 ¾</b> tugmasini bosing!"
             )
             
             # 5. Yuborish (reply_markup=stansiya_tugmasi qo'shildi)
@@ -226,6 +230,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
