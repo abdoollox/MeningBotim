@@ -172,7 +172,7 @@ async def ism_qabul_qilish(message: types.Message):
             # 4. Javob matni
             success_caption = (
                 f"🦉 ✉️\n\n"
-                f"<b>«Garri Potter Cinema» guruhiga qabul qilindingiz, {haqiqiy_ism}!</b>\n\n"
+                f"<b>{haqiqiy_sim}, «Garri Potter Cinema» guruhiga qabul qilindingiz!</b>\n\n"
                 f"Quyida sehrli olamga kirish chiptangiz:\n"
                 f"🔗 {link.invite_link}\n\n"
                 f"<i>🎫 Bu chipta faqat siz uchun!</i>"
@@ -215,6 +215,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
