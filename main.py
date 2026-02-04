@@ -203,14 +203,27 @@ async def payment_info(callback: types.CallbackQuery):
     )
     await callback.message.answer(matn, parse_mode="Markdown")
 
-# --- 7-QADAM: CHEKNI QABUL QILISH ---
+# --- 7-QADAM: CHEK QABUL QILISH VA ID OLISH (YANGILANGAN QISM) ---
 @dp.message(F.photo | F.document)
 async def handle_receipt(message: types.Message):
     user_id = message.from_user.id
+    
+    # --- 1. ADMIN UCHUN MAXSUS YO'L (ID OLISH) ---
+    if user_id == ADMIN_ID:
+        # Agar rasm Admin dan kelsa, uning ID sini qaytaramiz
+        file_id = None
+        if message.photo:
+            file_id = message.photo[-1].file_id
+        elif message.document:
+            file_id = message.document.file_id
+            
+        await message.reply(f"🔑 <b>Fayl ID:</b>\n<code>{file_id}</code>", parse_mode="HTML")
+        return # <-- MUHIM: Shu yerda to'xtaymiz, pastga o'tmaymiz!
+
+    # --- 2. MIJOZLAR UCHUN (CHEK QABUL QILISH) ---
     first_name = message.from_user.first_name
     username = message.from_user.username or "nomalum"
     
-    # Admin uchun tugmalar
     admin_tugma = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"confirm_{user_id}"),
@@ -220,14 +233,12 @@ async def handle_receipt(message: types.Message):
     
     caption_text = f"📩 **Yangi to'lov!**\n👤: {first_name} (@{username})\nID: {user_id}"
     
-    # Adminga yuborish
     try:
         if message.photo:
             await bot.send_photo(chat_id=ADMIN_ID, photo=message.photo[-1].file_id, caption=caption_text, reply_markup=admin_tugma)
         elif message.document:
             await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
             
-        # Mijozga javob (Gringotts uslubida)
         kutish_matni = (
             "🦉 **Chek qabul qilindi!**\n\n"
             "Gringotts goblinlari 🧐 to'lovni tekshirishni boshlashdi.\n"
@@ -333,6 +344,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
