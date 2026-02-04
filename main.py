@@ -169,7 +169,7 @@ async def generate_invite(message: types.Message, state: FSMContext):
     )
     
     tugma = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="ℹ️ Guruh haqida ma'lumot", callback_data="show_info")]
+        [InlineKeyboardButton(text="📜 Xatning davomini o'qish", callback_data="show_info")]
     ])
     
     if rasm:
@@ -365,6 +365,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
