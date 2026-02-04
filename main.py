@@ -191,7 +191,7 @@ async def show_info_handler(callback: types.CallbackQuery):
         "Bu yerda siz:\n"
         "🎬 «Garri Potter» asarining barcha filmlarini 4K formatda\n"
         "🌍 3 xil tilda: ingliz, rus va o'zbek tillarida\n"
-        "🎶 8 ta filming soundtrek alblomlarini\n"
+        "🎶 8 ta filming soundtrek albomlarini\n"
         "📚 Asarning barcha 8 ta elektron kitoblarini\n"
         "🎧 Kitoblarning audio shakladi audikitoblarini\n"
         "🎨 San'at asari darajasida chizilgan posterlar to'plamini\n"
@@ -217,10 +217,10 @@ async def show_info_handler(callback: types.CallbackQuery):
 @dp.callback_query(F.data == "buy_ticket")
 async def payment_info(callback: types.CallbackQuery):
     matn = (
-        f"💳 **Gringotts Banki hisob raqami:**\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
-        f"💰 **To'lov miqdori:** {MAHSULOT_NARXI}\n\n"
-        "❗️ To'lov qilganingizdan so'ng, **chek rasmini** (skrinshot) shu yerga yuboring.\n"
-        "Bizning goblinlar tekshirib, sizga **Chipta** yuborishadi."
+        f"💳 Gringotts Banki hisob raqami:\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
+        f"💰 To'lov miqdori: {MAHSULOT_NARXI}\n\n"
+        "❗️ To'lov qilganingizdan so'ng, chek rasmini (skrinshot) shu yerga yuboring!\n"
+        "🔎 Bizning goblinlar tekshirib, sizga chipta yuborishadi."
     )
     await callback.message.answer(matn, parse_mode="Markdown")
 
@@ -261,10 +261,13 @@ async def handle_receipt(message: types.Message):
             await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
             
         kutish_matni = (
-            "🦉 **Chek qabul qilindi!**\n\n"
-            "Gringotts goblinlari 🧐 to'lovni tekshirishni boshlashdi.\n"
-            "Agar hammasi joyida bo'lsa, tez orada sizga **Platforma 9 ¾ Chiptasi** yuboriladi.\n\n"
-            "_Tekshirish vaqti: 10 daqiqadan 8 soatgacha._"
+            "🦉 Chek ukkilar tomonidan bankka yuborildi!\n\n"
+            
+            "🧐 Gringotts goblinlari to'lovni tekshirishni boshlashdi.\n"
+            "👌 Agar hammasi joyida bo'lsa, tez orada sizga Platforma 9¾ chiptasi yuboriladi.\n\n"
+            
+            "⏳ Tekshirish vaqti: 10 daqiqadan 8 soatgacha.\n"
+            "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!"
         )
         await message.answer(kutish_matni, parse_mode="Markdown")
         
@@ -365,6 +368,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
