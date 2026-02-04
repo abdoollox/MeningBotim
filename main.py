@@ -151,20 +151,21 @@ async def ask_name(callback: types.CallbackQuery, state: FSMContext):
 async def generate_invite(message: types.Message, state: FSMContext):
     ism = message.text
     user_id = message.from_user.id
-    
-    # Ismni xotiraga saqlab qo'yamiz (Keyinchalik Chipta uchun kerak bo'ladi)
     USER_NAMES[user_id] = ism
     
-    await message.answer("⏳ Boyqushlar taklifnomangizni yozishmoqda...")
+    await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
     
-    # Taklifnoma (Invite) yaratish
+    # Rasm yaratish
     rasm = rasm_yaratish(ism, "invite")
     
     caption_text = (
-        f"📩 **Sizga xat keldi, {ism}!**\n\n"
-        "Siz rasman **«Hogwarts Cinema»** yopiq klubiga taklif qilindingiz.\n\n"
-        "Lekin poyezdga chiqish uchun sizga **Platforma 9 ¾ Chiptasi** kerak bo'ladi.\n"
-        "Guruh haqida to'liq ma'lumotni o'qib chiqing."
+        f"🫨 {ism}, xat siz uchun yozilgan ekan!\n\n"
+        
+        "Siz rasman «Hogwarts Cinema» yopiq klubiga taklif qilinibsiz. Bu qanchalik baxt!\n\n"
+        
+        "Bu yopiq klub hamma ham kira olmaydi. Siz tanlanganlar qatoriga qo'shilibsiz.\n\n"
+
+        "«Hogwarts Cinema» klubi haqida eshitganmisiz? Agar yo'q bo'lsa, xatni davomini o'qing!"
     )
     
     tugma = InlineKeyboardMarkup(inline_keyboard=[
@@ -174,9 +175,9 @@ async def generate_invite(message: types.Message, state: FSMContext):
     if rasm:
         await message.answer_photo(BufferedInputFile(rasm.read(), filename="invite.jpg"), caption=caption_text, reply_markup=tugma)
     else:
-        await message.answer("Rasm yaratishda xatolik bo'ldi, lekin davom etishingiz mumkin.", reply_markup=tugma)
+        await message.answer("Rasm yaratishda xatolik, lekin davom eting.", reply_markup=tugma)
         
-    await state.clear() # State dan chiqamiz
+    await state.clear()
 
 # --- 5-QADAM: MA'LUMOT VA CHIPTA SHARTI ---
 @dp.callback_query(F.data == "show_info")
@@ -350,6 +351,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
