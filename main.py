@@ -22,7 +22,7 @@ MAHSULOT_NARXI = "50 000 so'm"
 
 # Rasmlar va Videolar ID lari (Bularni botga rasm tashlab, ID sini olib o'zgartirasiz)
 LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0RJaTX9PAEAAwIAA3gAAzgE" # Qulflangan chemodan ID si
-OPENED_IMG_ID = "AgACAgIAAxkBAAEg3zlpggp59M9YVLTBP0qRtNhhCrcaNwAC2BBrG9UyEEjTE0sWTmQYZQEAAwIAA3gAAzgE" # Ochilgan chemodan ID si
+OPENED_IMG_ID = "AgACAgIAAxkBAAIBLWmDZ3Ayni9rRSVEvhjpNzNnMNjxAAK2EGsbElQZSFWpvS_4YYirAQADAgADeQADOAQ" # Ochilgan chemodan ID si
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
 
 # Botni sozlash
@@ -344,6 +344,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
