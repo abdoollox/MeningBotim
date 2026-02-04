@@ -138,10 +138,11 @@ async def ask_name(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(
         "📜 Xat ochildi!**\n\n"
         
-        "Qiziq, sizning ism va familyangiz nima edi?\n\n"
+        "🧐 Qiziq, qiziq, juda ham qiziq...\n\n"
         
-        "Tekshirib olishimiz uchun ismingizni to'liq holda yoza olasizmi?\n"
-        "Misol uchun, Abdulloh Karimberdiyev"
+        "Sizning ism va familyangiz nima edi?\n\n"
+        
+        "🔎 Tekshirib olishimiz uchun ismingizni to'liq holda yoza olasizmi?"
     )
     await state.set_state(UserState.waiting_for_name)
 
@@ -349,6 +350,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
