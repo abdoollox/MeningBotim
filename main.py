@@ -136,9 +136,12 @@ async def cmd_open_suitcase(message: types.Message):
 async def ask_name(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.answer(
-        "🖋 **Hogwarts taklifnomasiga kimning ismini yozamiz?**\n\n"
-        "Iltimos, Ism va Familiyangizni yozib yuboring.\n"
-        "_(Misol: Abdulloh Karimberdiyev)_"
+        "📜 Xat ochildi!**\n\n"
+        
+        "Qiziq, sizning ism va familyangiz nima edi?\n\n"
+        
+        "Tekshirib olishimiz uchun ismingizni to'liq holda yoza olasizmi?\n"
+        "Misol uchun, Abdulloh Karimberdiyev"
     )
     await state.set_state(UserState.waiting_for_name)
 
@@ -346,6 +349,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
