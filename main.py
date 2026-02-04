@@ -49,7 +49,7 @@ def rasm_yaratish(ism, shablon_turi="invite"):
         if shablon_turi == "invite":
             img_path = "assets/invite.jpg" # Taklifnoma foni
             font_size = 60
-            y_offset = -100 # Matnni tepa-past qilish uchun
+            y_offset = -50 # Matnni tepa-past qilish uchun
         else:
             img_path = "assets/ticket.jpg" # Chipta foni
             font_size = 45
@@ -350,6 +350,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
