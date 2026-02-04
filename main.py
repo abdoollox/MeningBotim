@@ -213,16 +213,23 @@ async def show_info_handler(callback: types.CallbackQuery):
         # Agar rasm ID si xato bo'lsa, faqat matn boradi
         await callback.message.answer(matn, reply_markup=tugma, parse_mode="Markdown")
 
-# --- 6-QADAM: TO'LOV MA'LUMOTLARI ---
+# --- 6-QADAM: TO'LOV MA'LUMOTLARI (RASM BILAN) ---
 @dp.callback_query(F.data == "buy_ticket")
 async def payment_info(callback: types.CallbackQuery):
+    # 1. BU YERGA YANGI "GRINGOTTS" RASMI ID SINI QO'YASIZ:
+    TO_LOV_RASMI_ID = "AgACAgIAAxkBAAIBdGmDsD9t3C-hmRVIRIxfWtO-Wu_9AAJLE2sbElQZSP4w9uywRSKdAQADAgADeQADOAQ" 
+    
     matn = (
-        f"💳 Gringotts Banki hisob raqami:\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
-        f"💰 To'lov miqdori: {MAHSULOT_NARXI}\n\n"
-        "❗️ To'lov qilganingizdan so'ng, chek rasmini (skrinshot) shu yerga yuboring!\n"
-        "🔎 Bizning goblinlar tekshirib, sizga chipta yuborishadi."
+        f"💳 **Gringotts Banki hisob raqami:**\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
+        f"💰 **To'lov miqdori:** {MAHSULOT_NARXI}\n\n"
+        "❗️ To'lov qilganingizdan so'ng, **chek rasmini** (skrinshot) shu yerga yuboring.\n"
+        "Bizning goblinlar tekshirib, sizga **Chipta** yuborishadi."
     )
-    await callback.message.answer(matn, parse_mode="Markdown")
+    
+    try:
+        await callback.message.answer_photo(photo=TO_LOV_RASMI_ID, caption=matn, parse_mode="Markdown")
+    except:
+        await callback.message.answer(matn, parse_mode="Markdown")
 
 # --- 7-QADAM: CHEK QABUL QILISH VA ID OLISH (YANGILANGAN QISM) ---
 @dp.message(F.photo | F.document)
@@ -368,6 +375,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
