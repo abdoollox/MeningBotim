@@ -134,7 +134,7 @@ async def cmd_open_suitcase(message: types.Message):
 # --- 3-QADAM: ISMNI SO'RASH ---
 @dp.callback_query(F.data == "get_invite_letter")
 async def ask_name(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete() # Eski xabarni o'chiramiz
+    await callback.answer()
     await callback.message.answer(
         "🖋 **Hogwarts taklifnomasiga kimning ismini yozamiz?**\n\n"
         "Iltimos, Ism va Familiyangizni yozib yuboring.\n"
@@ -346,6 +346,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
