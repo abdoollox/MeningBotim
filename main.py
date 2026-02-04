@@ -114,7 +114,7 @@ async def cmd_open_suitcase(message: types.Message):
     # Banner: Ochilgan chemodan (Xat va Broshura ko'rinadi)
     
     caption_text = (
-        "🔓 Qulf ochildi!**\n\n"
+        "🔓 Qulf ochildi!\n\n"
         
         "✨ Tabriklaymiz! Siz sehrli chemodanni ochdingiz.\n"
         "Ichida qandaydir narsalar va muhrlangan xat borga o'xshayapti.\n\n"
@@ -346,6 +346,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
