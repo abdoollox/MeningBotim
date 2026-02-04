@@ -114,14 +114,16 @@ async def cmd_open_suitcase(message: types.Message):
     # Banner: Ochilgan chemodan (Xat va Broshura ko'rinadi)
     
     caption_text = (
-        "✨ **CLICK! Qulf ochildi!**\n\n"
-        "Tabriklaymiz! Siz sehrli chemodanni ochdingiz.\n"
-        "Ichida siz uchun atalgan **Muhrlangan Xat** va **Hogwarts Cinema** haqida ma'lumotlar bor.\n\n"
-        "Xatda kimning ismi bo'lishini xohlaysiz?"
+        "🔓 Qulf ochildi!**\n\n"
+        
+        "✨ Tabriklaymiz! Siz sehrli chemodanni ochdingiz.\n"
+        "Ichida qandaydir narsalar va muhrlangan xat borga o'xshayapti.\n\n"
+        
+        "🤔 Xat kim uchun atalgan ekan? Qiziq!"
     )
     
     tugma = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✉️ Xatni (Taklifnoma) olish", callback_data="get_invite_letter")]
+        [InlineKeyboardButton(text="✉️ Xatni ochish", callback_data="get_invite_letter")]
     ])
     
     try:
@@ -344,6 +346,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
