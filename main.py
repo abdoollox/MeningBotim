@@ -136,7 +136,7 @@ async def cmd_open_suitcase(message: types.Message):
 async def ask_name(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     await callback.message.answer(
-        "📜 Xat ochildi!**\n\n"
+        "📜 Xat ochildi!\n\n"
         
         "🧐 Qiziq, qiziq, juda ham qiziq...\n\n"
         
@@ -365,6 +365,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
