@@ -24,6 +24,7 @@ MAHSULOT_NARXI = "50 000 so'm"
 LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0RJaTX9PAEAAwIAA3gAAzgE" # Qulflangan chemodan ID si
 OPENED_IMG_ID = "AgACAgIAAxkBAAIBLWmDZ3Ayni9rRSVEvhjpNzNnMNjxAAK2EGsbElQZSFWpvS_4YYirAQADAgADeQADOAQ" # Ochilgan chemodan ID si
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
+GOBLIN_CHECK_ID = "AgACAgIAAxkBAAIBgmmDtnNGAdxQApSRrYFCEKiv2HQYAAJsE2sbElQZSDJ0xk6En6WBAQADAgADeQADOAQ"
 
 # Botni sozlash
 bot = Bot(token=API_TOKEN)
@@ -231,22 +232,20 @@ async def payment_info(callback: types.CallbackQuery):
     except:
         await callback.message.answer(matn, parse_mode="Markdown")
 
-# --- 7-QADAM: CHEK QABUL QILISH VA ID OLISH (YANGILANGAN QISM) ---
+# --- 7-QADAM: CHEK QABUL QILISH (RASM BILAN) ---
 @dp.message(F.photo | F.document)
 async def handle_receipt(message: types.Message):
     user_id = message.from_user.id
     
     # --- 1. ADMIN UCHUN MAXSUS YO'L (ID OLISH) ---
     if user_id == ADMIN_ID:
-        # Agar rasm Admin dan kelsa, uning ID sini qaytaramiz
         file_id = None
         if message.photo:
             file_id = message.photo[-1].file_id
         elif message.document:
             file_id = message.document.file_id
-            
         await message.reply(f"🔑 <b>Fayl ID:</b>\n<code>{file_id}</code>", parse_mode="HTML")
-        return # <-- MUHIM: Shu yerda to'xtaymiz, pastga o'tmaymiz!
+        return 
 
     # --- 2. MIJOZLAR UCHUN (CHEK QABUL QILISH) ---
     first_name = message.from_user.first_name
@@ -261,12 +260,15 @@ async def handle_receipt(message: types.Message):
     
     caption_text = f"📩 **Yangi to'lov!**\n👤: {first_name} (@{username})\nID: {user_id}"
     
+    # Adminga yuborish va Mijozga javob qaytarish
     try:
+        # 1. Adminga chekni yuboramiz
         if message.photo:
             await bot.send_photo(chat_id=ADMIN_ID, photo=message.photo[-1].file_id, caption=caption_text, reply_markup=admin_tugma)
         elif message.document:
             await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
             
+        # 2. Mijozga "Goblin tekshiryapti" degan rasm va matnni yuboramiz
         kutish_matni = (
             "🦉 Chek ukkilar tomonidan bankka yuborildi!\n\n"
             
@@ -276,7 +278,13 @@ async def handle_receipt(message: types.Message):
             "⏳ Tekshirish vaqti: 10 daqiqadan 8 soatgacha.\n"
             "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!"
         )
-        await message.answer(kutish_matni, parse_mode="Markdown")
+        
+        # MANA SHU YER O'ZGARDI (Rasm bilan yuborish):
+        try:
+            await message.answer_photo(photo=GOBLIN_CHECK_ID, caption=kutish_matni, parse_mode="Markdown")
+        except:
+            # Agar rasm ID si xato bo'lsa, xavfsizlik uchun faqat matnni o'zi boradi
+            await message.answer(kutish_matni, parse_mode="Markdown")
         
     except Exception as e:
         await message.answer("Xatolik: Adminga yuborib bo'lmadi.")
@@ -375,6 +383,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
