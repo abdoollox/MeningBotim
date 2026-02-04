@@ -179,25 +179,39 @@ async def generate_invite(message: types.Message, state: FSMContext):
         
     await state.clear()
 
-# --- 5-QADAM: MA'LUMOT VA CHIPTA SHARTI ---
+# --- 5-QADAM: MA'LUMOT VA CHIPTA SHARTI (RASM BILAN) ---
 @dp.callback_query(F.data == "show_info")
 async def show_info_handler(callback: types.CallbackQuery):
+    # 1. BU YERGA XATNING PASTKI QISMI (INFO) RASMI ID SINI QO'YING:
+    XAT_PAST_ID = "AgACAgIAAxkBAAIBUmmDh7oFbWda6w83ehovduXBLX4OAAL9EWsbElQZSIWIAAGNZ-Sw4QEAAwIAA3gAAzgE" 
+    
     matn = (
-        "🏰 **Hogwarts Cinema — Bu shunchaki kanal emas!**\n\n"
+        "🏰 «Hogwarts Cinema» — Bu shunchaki guruh emas!\n\n"#
+        
         "Bu yerda siz:\n"
-        "🎬 Barcha 8 qism filmlarni 4K formatda;\n"
-        "🎞 Kesilgan va rejissyorlik sahnalarini;\n"
-        "🎧 O'zbek tilidagi professional audiokitoblarni topasiz.\n\n"
-        "⚠️ **Kirish sharti:**\n"
-        "Guruh yopiq va unga kirish uchun **Bir martalik Chipta** xarid qilishingiz kerak.\n"
-        "Chipta narxi: **50 000 so'm** (Umrbod kirish)."
+        "🎬 «Garri Potter» asarining barcha filmlarini 4K formatda\n"
+        "🌍 3 xil tilda: ingliz, rus va o'zbek tillarida\n"
+        "🎶 8 ta filming soundtrek alblomlarini\n"
+        "📚 Asarning barcha 8 ta elektron kitoblarini\n"
+        "🎧 Kitoblarning audio shakladi audikitoblarini\n"
+        "🎨 San'at asari darajasida chizilgan posterlar to'plamini\n"
+        "🎮 Sehrli olam uchun ishlab chiqilgan mobil va kompyuter o'yinlarini\n"
+        "👥 Siz kabilar jamlangan jamiyat bor\n\n"
+        
+        "1️⃣ «Hogwarts»ga ketish uchun faqat bir dona qadam qoldi.\n"
+        "🚂 Poyezdga chiqish uchun sizda Platform 9¾ chiptasi bo'lishi kerak!\n"
     )
     
     tugma = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎫 Chipta xarid qilish", callback_data="buy_ticket")]
     ])
     
-    await callback.message.answer(matn, reply_markup=tugma, parse_mode="Markdown")
+    # Rasm bilan yuboramiz
+    try:
+        await callback.message.answer_photo(photo=XAT_PAST_ID, caption=matn, reply_markup=tugma, parse_mode="Markdown")
+    except:
+        # Agar rasm ID si xato bo'lsa, faqat matn boradi
+        await callback.message.answer(matn, reply_markup=tugma, parse_mode="Markdown")
 
 # --- 6-QADAM: TO'LOV MA'LUMOTLARI ---
 @dp.callback_query(F.data == "buy_ticket")
@@ -351,6 +365,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
