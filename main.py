@@ -25,6 +25,7 @@ LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0R
 OPENED_IMG_ID = "AgACAgIAAxkBAAIBLWmDZ3Ayni9rRSVEvhjpNzNnMNjxAAK2EGsbElQZSFWpvS_4YYirAQADAgADeQADOAQ" # Ochilgan chemodan ID si
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
 GOBLIN_CHECK_ID = "AgACAgIAAxkBAAIBgmmDtnNGAdxQApSRrYFCEKiv2HQYAAJsE2sbElQZSDJ0xk6En6WBAQADAgADeQADOAQ"
+RAD_ETISH_IMG_ID = "AgACAgIAAxkBAAIBkGmDvYqpIyW_PMMYejTFW6UuuRdeAAKQE2sbElQZSDEI3IolpDreAQADAgADeQADOAQ"
 
 # Botni sozlash
 bot = Bot(token=API_TOKEN)
@@ -289,23 +290,31 @@ async def handle_receipt(message: types.Message):
     except Exception as e:
         await message.answer("Xatolik: Adminga yuborib bo'lmadi.")
 
-# --- 8-QADAM: ADMIN JAVOBI (RAD ETISH) ---
+# --- 8-QADAM: RAD ETISH (RASM BILAN) ---
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_payment(callback: types.CallbackQuery):
     user_id = int(callback.data.split("_")[1])
     
     rad_matni = (
-        "🏦 **Gringotts Banki xabarnomasi**\n\n"
-        "Goblinlar chekni haqiqiy emas deb topishdi. 🙅‍♂️\n"
-        "Iltimos, to'lovni qayta tekshirib, haqiqiy chekni yuboring."
+        "🚫 To'lov rad etildi!\n\n"
+        
+        "🧐 Gringotts goblinlari ushbu chekni haqiqiy emas deb topishdi yoki to'lov summasi noto'g'ri.\n\n"
+        
+        "Iltimos, qayta tekshirib, haqiqiy chekni yuboring!\n\n"
+        
+        "🚂 Aks holda poyezdga chiqishga kech qolishingiz mumkin."
     )
     
     try:
-        await bot.send_video(chat_id=user_id, video=RAD_ETISH_VIDEO_ID, caption=rad_matni)
-        await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n<b>RAD ETILDI</b>", parse_mode="HTML")
+        # 1. Mijozga rad etilganlik haqida rasm va xabar boradi
+        await bot.send_photo(chat_id=user_id, photo=RAD_ETISH_IMG_ID, caption=rad_matni, parse_mode="Markdown")
+        
+        # 2. Admin panelidagi xabarni o'zgartirib qo'yamiz (Admin bilishi uchun)
+        await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n<b>RAD ETILDI 🚫</b>", parse_mode="HTML")
+        
     except Exception as e:
         await callback.message.answer(f"Xatolik: {e}")
-
+        
 # --- 9-QADAM: ADMIN JAVOBI (TASDIQLASH VA CHIPTA BERISH) ---
 @dp.callback_query(F.data.startswith("confirm_"))
 async def confirm_payment(callback: types.CallbackQuery):
@@ -329,10 +338,11 @@ async def confirm_payment(callback: types.CallbackQuery):
         ])
         
         caption_text = (
-            f"🎫 **CHIPTANGIZ TAYYOR, {mijoz_ismi}!**\n\n"
-            "Xogvarts Ekspressi jo'nashga tayyor. 🚂\n"
-            "Quyidagi tugmani bosib, sehrli olamga kiring!\n\n"
-            "👋 **Xush kelibsiz!**"
+            f"🎫 Mana sizning chiptangiz!\n\n"
+            
+            "🚂 Xogvarts Ekspressi jo'nashga tayyor.\n\n"
+            
+            "👇 Quyidagi tugmani bosib, sehrli olamga kiring!"
         )
         
         if chipta_rasmi:
@@ -383,6 +393,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
