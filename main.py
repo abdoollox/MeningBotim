@@ -55,7 +55,7 @@ def rasm_yaratish(ism, shablon_turi="invite"):
         else:
             img_path = "assets/ticket.jpg" # Chipta foni
             font_size = 45
-            y_offset = 50 # Chiptada ism qayerda turishi kerakligi
+            y_offset = 1000 # Chiptada ism qayerda turishi kerakligi
             
         img = Image.open(img_path)
         draw = ImageDraw.Draw(img)
@@ -324,8 +324,6 @@ async def confirm_payment(callback: types.CallbackQuery):
         # Ismni xotiradan olamiz. Agar topilmasa "Talaba" deb yozamiz
         mijoz_ismi = USER_NAMES.get(user_id, "Talaba")
         
-        await bot.send_message(user_id, "✅ To'lov tasdiqlandi! Chiptangiz bosilmoqda...")
-        
         # 1. CHIPTA YARATISH (Ticket)
         chipta_rasmi = rasm_yaratish(mijoz_ismi, "ticket")
         
@@ -393,6 +391,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
