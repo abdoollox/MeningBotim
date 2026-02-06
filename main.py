@@ -234,7 +234,7 @@ async def payment_info(callback: types.CallbackQuery):
         await callback.message.answer(matn, parse_mode="Markdown")
 
 # --- 7-QADAM: CHEK QABUL QILISH (RASM BILAN) ---
-@dp.message(F.photo | F.document)
+@dp.message(F.photo | F.document) & (F.chat.type == "private"))
 async def handle_receipt(message: types.Message):
     user_id = message.from_user.id
     
@@ -391,6 +391,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
