@@ -374,23 +374,6 @@ async def start_web_server():
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
 
-# --- VIDEO ID OLSISH (Yordamchi) ---
-@dp.message(F.video)
-async def video_id_olish(message: types.Message):
-    await message.reply(f"`{message.video.file_id}`", parse_mode="Markdown")
-
-# --- RASM ID OLSISH (Yordamchi) ---
-@dp.message(F.photo)
-async def photo_id_olish(message: types.Message):
-    await message.reply(f"`{message.photo[-1].file_id}`", parse_mode="Markdown")
-
-async def main():
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    await start_web_server()
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
 
 
 
