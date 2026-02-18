@@ -119,13 +119,20 @@ async def cmd_open_suitcase(message: types.Message):
 # --- 3-QADAM: ISMNI SO'RASH ---
 @dp.callback_query(F.data == "get_invite_letter")
 async def ask_name(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer()
+    # 1. Pop-up xabar chiqaramiz (Xat ochilmoqda)
+    await callback.answer("Xat ochilmoqda... 📩", show_alert=False)
+    
+    # 2. 3 soniya kutamiz (Kutish hissini berish uchun)
+    await asyncio.sleep(3)
+    
+    # 3. Keyingi xabarni yuboramiz va ism so'raymiz
     await callback.message.answer(
         "📜 Xat ochildi!\n\n"
         "🧐 Qiziq, qiziq, juda ham qiziq...\n\n"
         "Sizning ism va familyangiz nima edi?\n\n"
         "🔎 Tekshirib olishimiz uchun ismingizni to'liq holda yoza olasizmi?"
     )
+    # Holatni ism kutish rejimiga o'tkazamiz
     await state.set_state(UserState.waiting_for_name)
 
 # --- 4-QADAM: TAKLIFNOMA YARATISH ---
@@ -314,6 +321,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
