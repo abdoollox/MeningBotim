@@ -142,7 +142,16 @@ async def generate_invite(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     USER_NAMES[user_id] = ism
     
+    # 1. Hayratlanish xabari (Pop-up o'rniga)
+    await message.answer("Ko'zlarimga ishonolmayapman... 😯")
+    
+    # 2. "Bot rasm yuklayapti..." degan statusni yoqib qo'yamiz (tepada ko'rinadi)
     await bot.send_chat_action(chat_id=message.chat.id, action="upload_photo")
+    
+    # 3. 3 soniya pauza (Suspense effekti)
+    await asyncio.sleep(3)
+    
+    # Rasm yaratish
     rasm = rasm_yaratish(ism, "invite")
     
     caption_text = (
@@ -150,6 +159,7 @@ async def generate_invite(message: types.Message, state: FSMContext):
         "Siz rasman «Hogwarts Cinema» yopiq klubiga taklif qilinibsiz. Bu qanchalik baxt!\n\n"
         "«Hogwarts Cinema» klubi haqida eshitganmisiz? Agar yo'q bo'lsa, xatni davomini o'qing!"
     )
+    
     tugma = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📜 Xatning davomini o'qish", callback_data="show_info")]
     ])
@@ -158,6 +168,8 @@ async def generate_invite(message: types.Message, state: FSMContext):
         await message.answer_photo(BufferedInputFile(rasm.read(), filename="invite.jpg"), caption=caption_text, reply_markup=tugma)
     else:
         await message.answer("Rasm yaratishda xatolik, lekin davom eting.", reply_markup=tugma)
+    
+    # Holatni tozalaymiz
     await state.clear()
 
 # --- 5-QADAM: MA'LUMOT ---
@@ -321,6 +333,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
