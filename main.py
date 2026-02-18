@@ -90,7 +90,13 @@ async def cmd_muggle_start(message: types.Message):
 
 @dp.callback_query(F.data == "alohomora_action")
 async def alohomora_tugma_bosildi(callback: types.CallbackQuery):
-    await callback.answer("Sehr ishlamoqda... ✨")
+    # 1. "Sehr ishlamoqda..." yozuvi chiqadi
+    await callback.answer("Sehr ishlamoqda... ✨", show_alert=False)
+    
+    # 2. 3 soniya kutib turamiz (Afsun ta'sir qilishi uchun)
+    await asyncio.sleep(3) 
+    
+    # 3. Va nihoyat chemodan ochiladi
     await cmd_open_suitcase(callback.message)
 
 # --- 2-QADAM: ALOHOMORA ---
@@ -308,5 +314,6 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
