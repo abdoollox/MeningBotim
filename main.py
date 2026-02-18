@@ -134,7 +134,7 @@ async def generate_invite(message: types.Message, state: FSMContext):
     
     caption_text = (
         f"🫨 {ism}, xat siz uchun yozilgan ekan!\n\n"
-        "Siz rasman «Hogwarts Cinema» yopiq klubiga taklif qilinibsiz.\n\n"
+        "Siz rasman «Hogwarts Cinema» yopiq klubiga taklif qilinibsiz. Bu qanchalik baxt!\n\n"
         "«Hogwarts Cinema» klubi haqida eshitganmisiz? Agar yo'q bo'lsa, xatni davomini o'qing!"
     )
     tugma = InlineKeyboardMarkup(inline_keyboard=[
@@ -153,7 +153,17 @@ async def show_info_handler(callback: types.CallbackQuery):
     XAT_PAST_ID = "AgACAgIAAxkBAAIBUmmDh7oFbWda6w83ehovduXBLX4OAAL9EWsbElQZSIWIAAGNZ-Sw4QEAAwIAA3gAAzgE" 
     matn = (
         "🏰 «Hogwarts Cinema» — Bu shunchaki guruh emas!\n\n"
-        "Bu yerda siz barcha filmlar, kitoblar va o'yinlarni topasiz.\n\n"
+        
+        "Bu yerda siz:\n"
+        "🎬 «Garri Potter» asarining barcha filmlarini 4K formatda\n"
+        "🌍 3 xil tilda: ingliz, rus va o'zbek tillarida\n"
+        "🎶 8 ta filming soundtrek albomlarini\n"
+        "📚 Asarning barcha 8 ta elektron kitoblarini\n"
+        "🎧 Kitoblarning audio shakladi audikitoblarini\n"
+        "🎨 San'at asari darajasida chizilgan posterlar to'plamini\n"
+        "🎮 Sehrli olam uchun ishlab chiqilgan mobil va kompyuter o'yinlarini\n"
+        "👥 Siz kabilar jamlangan jamiyat bor\n\n"
+        
         "1️⃣ «Hogwarts»ga ketish uchun faqat bir dona qadam qoldi.\n"
         "🚂 Poyezdga chiqish uchun sizda Platform 9¾ chiptasi bo'lishi kerak!"
     )
@@ -171,8 +181,12 @@ async def payment_info(callback: types.CallbackQuery):
     TO_LOV_RASMI_ID = "AgACAgIAAxkBAAIBdGmDsD9t3C-hmRVIRIxfWtO-Wu_9AAJLE2sbElQZSP4w9uywRSKdAQADAgADeQADOAQ" 
     matn = (
         f"💳 **Gringotts Banki hisob raqami:**\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
+        
         f"💰 **To'lov miqdori:** {MAHSULOT_NARXI}\n\n"
-        "❗️ To'lov qilganingizdan so'ng, **chek rasmini** (skrinshot) shu yerga yuboring."
+        
+        "❗️ To'lov qilganingizdan so'ng, **chek rasmini** (skrinshot) shu yerga yuboring.\n\n"
+        
+        "🔎 Bizning goblinlar tekshirib, sizga Chipta yuborishadi."
     )
     try:
         await callback.message.answer_photo(photo=TO_LOV_RASMI_ID, caption=matn, parse_mode="Markdown")
@@ -203,7 +217,14 @@ async def handle_receipt(message: types.Message):
         elif message.document:
             await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
             
-        kutish_matni = "🦉 Chek ukkilar tomonidan bankka yuborildi!\n⏳ Tekshirish vaqti: 10 daqiqadan 8 soatgacha."
+        kutish_matni = (
+            "🦉 Chek ukkilar tomonidan bankka yuborildi!\n\n"
+            
+            "🧐 Gringotts goblinlari to'lovni tekshirishni boshlashdi. Agar hammasi joyida bo'lsa, tez orada sizga Platforma 9¾ chiptasi yuboriladi.\n\n"
+            
+            "⏳ Tekshirish vaqti: 10 daqiqadan 8 soatgacha.\n"
+            "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!"
+                       )
         try:
             await message.answer_photo(photo=GOBLIN_CHECK_ID, caption=kutish_matni, parse_mode="Markdown")
         except:
@@ -215,7 +236,15 @@ async def handle_receipt(message: types.Message):
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_payment(callback: types.CallbackQuery):
     user_id = int(callback.data.split("_")[1])
-    rad_matni = "🚫 To'lov rad etildi!\n\nIltimos, haqiqiy chekni yuboring."
+    rad_matni = (
+        "🚫 To'lov rad etildi!\n\n"
+        
+        "🧐 Gringotts goblinlari ushbu chekni haqiqiy emas deb topishdi yoki to'lov summasi noto'g'ri.\n\n"
+        
+        "Iltimos, qayta tekshirib, haqiqiy chekni yuboring!\n\n"
+        
+        "🚂 Aks holda poyezdga chiqishga kech qolishingiz mumkin."
+                )
     try:
         await bot.send_photo(chat_id=user_id, photo=RAD_ETISH_IMG_ID, caption=rad_matni, parse_mode="Markdown")
         await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n<b>RAD ETILDI 🚫</b>", parse_mode="HTML")
@@ -232,7 +261,13 @@ async def confirm_payment(callback: types.CallbackQuery):
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
         stansiya_tugmasi = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🚂 Platforma 9 ¾ (Guruhga kirish)", url=link.invite_link)]])
         
-        caption_text = "🎫 Mana sizning chiptangiz!\n\n🚂 Xogvarts Ekspressi jo'nashga tayyor."
+        caption_text = (
+            "🎫 Mana sizning chiptangiz!\n\n
+            
+            "🚂 Xogvarts Ekspress jo'nashga tayyor.\n\n"
+
+            "👇 Quyidagi tugmani bosib, sehrli olamga kiring!"
+                       )
         
         if chipta_rasmi:
             await bot.send_photo(chat_id=user_id, photo=BufferedInputFile(chipta_rasmi.read(), filename="chipta.jpg"), caption=caption_text, reply_markup=stansiya_tugmasi, parse_mode="Markdown")
@@ -273,3 +308,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
