@@ -362,17 +362,21 @@ async def confirm_payment(callback: types.CallbackQuery):
 
 
 # --- SERVER SOZLAMALARI ---
-async def health_check(request):
-    return web.Response(text="Bot ishlamoqda!")
+async def main():
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    
+    # 1. RENDER UCHUN: Veb-serverni fonda ishga tushiramiz (ketma-ketlikni buzmaslik uchun)
+    asyncio.create_task(start_web_server())
+    
+    # 2. BOT UCHUN: Botni doimiy eshitish rejimida ishga tushiramiz
+    print("🚀 Bot va Server ishga tushdi!")
+    await dp.start_polling(bot)
 
-async def start_web_server():
-    app = web.Application()
-    app.router.add_get('/', health_check)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    port = int(os.environ.get("PORT", 8080))
-    site = web.TCPSite(runner, '0.0.0.0', port)
-    await site.start()
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.error("Bot to'xtatildi!")
 
 
 
