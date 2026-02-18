@@ -262,7 +262,7 @@ async def confirm_payment(callback: types.CallbackQuery):
         stansiya_tugmasi = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🚂 Platforma 9 ¾ (Guruhga kirish)", url=link.invite_link)]])
         
         caption_text = (
-            "🎫 Mana sizning chiptangiz!\n\n
+            "🎫 Mana sizning chiptangiz!\n\n"
             
             "🚂 Xogvarts Ekspress jo'nashga tayyor.\n\n"
 
@@ -308,4 +308,5 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
