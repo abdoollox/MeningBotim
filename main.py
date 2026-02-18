@@ -21,7 +21,7 @@ KARTA_EGA = "KARIMBERDIYEV ABDULLOH"
 MAHSULOT_NARXI = "50 000 so'm"
 
 # Rasmlar va Videolar ID lari
-LOCKED_IMG_ID = "AgACAgIAAxkBAAEg3zdpggpLHvTAVachHZH85O40qpW5igAChgxrGxJUEUhwB0RJaTX9PAEAAwIAA3gAAzgE" 
+LOCKED_IMG_ID = "AgACAgIAAxkBAAICN2mVtwWqD6xm4fflvliwITaK9jg2AAICGGsbrMSwSDZrcTcXlSaVAQADAgADeAADOgQ" 
 OPENED_IMG_ID = "AgACAgIAAxkBAAIBLWmDZ3Ayni9rRSVEvhjpNzNnMNjxAAK2EGsbElQZSFWpvS_4YYirAQADAgADeQADOAQ"
 RAD_ETISH_VIDEO_ID = "BAACAgIAAxkBAAPWaYGoqNqa7MS-YUfD1yKe0phpSfEAAoaTAALSnxBI0F8_tFFIS9U4BA"
 GOBLIN_CHECK_ID = "AgACAgIAAxkBAAIBgmmDtnNGAdxQApSRrYFCEKiv2HQYAAJsE2sbElQZSDJ0xk6En6WBAQADAgADeQADOAQ"
@@ -348,6 +348,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
