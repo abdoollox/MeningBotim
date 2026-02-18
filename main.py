@@ -211,6 +211,13 @@ async def show_info_handler(callback: types.CallbackQuery):
 # --- 6-QADAM: TO'LOV MA'LUMOTLARI ---
 @dp.callback_query(F.data == "buy_ticket")
 async def payment_info(callback: types.CallbackQuery):
+    # 1. Tugma bosilganda darhol pop-up xabar chiqaramiz
+    await callback.answer("Chipta shaxobchasiga borilmoqda... 🚶", show_alert=False)
+    
+    # 2. 3 soniya kutamiz (yo'lga ketgan vaqt effekti)
+    await asyncio.sleep(3)
+    
+    # 3. Gringotts to'lov ma'lumotlarini va rasmni yuboramiz
     TO_LOV_RASMI_ID = "AgACAgIAAxkBAAIBdGmDsD9t3C-hmRVIRIxfWtO-Wu_9AAJLE2sbElQZSP4w9uywRSKdAQADAgADeQADOAQ" 
     matn = (
         f"💳 **Gringotts Banki hisob raqami:**\n`{KARTA_RAQAM}`\n{KARTA_EGA}\n\n"
@@ -341,6 +348,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
