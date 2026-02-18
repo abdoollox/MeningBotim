@@ -175,6 +175,13 @@ async def generate_invite(message: types.Message, state: FSMContext):
 # --- 5-QADAM: MA'LUMOT ---
 @dp.callback_query(F.data == "show_info")
 async def show_info_handler(callback: types.CallbackQuery):
+    # 1. Tugma bosilganda darhol pop-up xabar chiqaramiz
+    await callback.answer("Xatning pastgi qismi ochilmoqda... 📜", show_alert=False)
+    
+    # 2. 3 soniya kutamiz (suspense effekti)
+    await asyncio.sleep(3)
+    
+    # 3. Xatning davomi va rasmni yuboramiz
     XAT_PAST_ID = "AgACAgIAAxkBAAIBUmmDh7oFbWda6w83ehovduXBLX4OAAL9EWsbElQZSIWIAAGNZ-Sw4QEAAwIAA3gAAzgE" 
     matn = (
         "🏰 «Hogwarts Cinema» — Bu shunchaki guruh emas!\n\n"
@@ -195,11 +202,12 @@ async def show_info_handler(callback: types.CallbackQuery):
     tugma = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🎫 Chipta xarid qilish", callback_data="buy_ticket")]
     ])
+    
     try:
         await callback.message.answer_photo(photo=XAT_PAST_ID, caption=matn, reply_markup=tugma, parse_mode="Markdown")
     except:
         await callback.message.answer(matn, reply_markup=tugma, parse_mode="Markdown")
-
+        
 # --- 6-QADAM: TO'LOV MA'LUMOTLARI ---
 @dp.callback_query(F.data == "buy_ticket")
 async def payment_info(callback: types.CallbackQuery):
@@ -333,6 +341,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
