@@ -1,11 +1,12 @@
-import json
-import gspread
-from google.oauth2.service_account import Credentials
 import asyncio
 import logging
 import os
 import sys
 import io
+import json
+import gspread
+from google.oauth2.service_account import Credentials
+from datetime import datetime, timedelta
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command, StateFilter
@@ -62,8 +63,12 @@ except Exception as e:
 async def save_to_sheet(user_id, ism, username):
     if ishchi_varaq:
         try:
-            # Bot qotib qolmasligi uchun jadvalga yozishni fonda (alohida thread) bajaramiz
-            await asyncio.to_thread(ishchi_varaq.append_row, [str(user_id), ism, f"@{username}"])
+            # Server vaqtiga 5 soat qo'shib, qat'iy Toshkent vaqtini olamiz
+            toshkent_vaqti = datetime.utcnow() + timedelta(hours=5)
+            sana = toshkent_vaqti.strftime("%Y-%m-%d %H:%M:%S") # Format: 2026-02-19 14:30:00
+
+            # 1-ustunga vaqtni qo'yamiz va yozamiz
+            await asyncio.to_thread(ishchi_varaq.append_row, [sana, str(user_id), ism, f"@{username}"])
         except Exception as e:
             logging.error(f"Jadvalga yozishda xato: {e}")
 
@@ -408,6 +413,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
