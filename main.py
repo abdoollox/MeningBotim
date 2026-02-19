@@ -371,25 +371,23 @@ async def handle_receipt(message: types.Message):
 # --- 8-QADAM: RAD ETISH ---
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_payment(callback: types.CallbackQuery):
-    try:
+    try: # <--- Bitta umumiy try funksiyaning boshida ochiladi
         user_id = int(callback.data.split("_")[1])
         
         # ⚡️ GOOGLE SHEETNI YANGILASH: Rad etildi
         await update_sheet(user_id, "Rad etildi ❌")
         
-    rad_matni = (
-        "🚫 To'lov rad etildi!\n\n"
+        rad_matni = (
+            "🚫 To'lov rad etildi!\n\n"
+            "🧐 Gringotts goblinlari ushbu chekni haqiqiy emas deb topishdi yoki to'lov summasi noto'g'ri.\n\n"
+            "Iltimos, qayta tekshirib, haqiqiy chekni yuboring!\n\n"
+            "🚂 Aks holda poyezdga chiqishga kech qolishingiz mumkin."
+        )
         
-        "🧐 Gringotts goblinlari ushbu chekni haqiqiy emas deb topishdi yoki to'lov summasi noto'g'ri.\n\n"
-        
-        "Iltimos, qayta tekshirib, haqiqiy chekni yuboring!\n\n"
-        
-        "🚂 Aks holda poyezdga chiqishga kech qolishingiz mumkin."
-                )
-    try:
         await bot.send_photo(chat_id=user_id, photo=RAD_ETISH_IMG_ID, caption=rad_matni, parse_mode="Markdown")
         await callback.message.edit_caption(caption=f"❌ {callback.message.caption}\n\n<b>RAD ETILDI 🚫</b>", parse_mode="HTML")
-    except Exception as e:
+        
+    except Exception as e: # <--- Eng oxirida bitta umumiy except hamma xatolikni ushlaydi
         await callback.message.answer(f"Xatolik: {e}")
         
 # --- 9-QADAM: ADMIN JAVOBI ---
@@ -453,6 +451,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
