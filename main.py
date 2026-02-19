@@ -72,6 +72,34 @@ def rasm_yaratish(ism, shablon_turi="invite"):
         logging.error(f"Rasm chizishda xatolik: {e}")
         return None
 
+# --- ADMIN UCHUN: STATISTIKA ---
+@dp.message(Command("stats"))
+async def cmd_admin_stats(message: types.Message):
+    # 1-Cheklov: Faqat admin ishlata oladi
+    if message.from_user.id != ADMIN_ID:
+        return # Boshqalar yozsa, bot jimgina e'tiborsiz qoldiradi
+
+    total_users = len(USER_NAMES)
+    
+    if total_users == 0:
+        await message.reply("📉 Hozircha botdan hech kim foydalanmadi (yoki server yaqinda o'chib yongan).")
+        return
+
+    text = f"📊 **Umumiy foydalanuvchilar soni:** {total_users} ta\n\n"
+    text += "👤 **Foydalanganlar ro'yxati:**\n"
+
+    for uid, name in USER_NAMES.items():
+        qator = f"- {name} (ID: <code>{uid}</code>)\n"
+        
+        # 2-Cheklov: Telegram xabar uzunligi limiti (4096) ga yetib qolmaslik uchun
+        if len(text) + len(qator) > 4000:
+            text += "\n...va yana boshqalar (Limitga yetdi)."
+            break
+            
+        text += qator
+
+    await message.reply(text, parse_mode="HTML")
+    
 # --- 1-QADAM: START ---
 @dp.message(Command("start"))
 async def cmd_muggle_start(message: types.Message):
@@ -348,6 +376,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
