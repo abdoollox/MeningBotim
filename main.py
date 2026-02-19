@@ -80,20 +80,26 @@ async def save_to_sheet(user_id, ism, username):
 async def update_sheet(user_id, status, file_id=None):
     if ishchi_varaq:
         try:
-            # 1. B ustundan (2-ustun) mijozning ID sini qidiramiz
-            cell = await asyncio.to_thread(ishchi_varaq.find, str(user_id), in_column=2)
-            row = cell.row
+            # 1. B ustundagi (ID lar joylashgan) barcha ma'lumotlarni tortib olamiz
+            ids_list = await asyncio.to_thread(ishchi_varaq.col_values, 2)
             
-            # 2. E ustuniga (5-ustun) STATUSni yozamiz
-            await asyncio.to_thread(ishchi_varaq.update_cell, row, 5, status)
-            
-            # 3. F ustuniga (6-ustun) CHEK ID sini yozamiz (agar yuborilgan bo'lsa)
-            if file_id:
-                await asyncio.to_thread(ishchi_varaq.update_cell, row, 6, str(file_id))
+            str_uid = str(user_id)
+            if str_uid in ids_list:
+                # 2. Ro'yxatni teskari qilib o'qiymiz va eng oxirgi kirgan ID qatorini topamiz
+                row = len(ids_list) - ids_list[::-1].index(str_uid)
+                
+                # 3. E ustuniga (5-ustun) STATUSni yozamiz
+                await asyncio.to_thread(ishchi_varaq.update_cell, row, 5, status)
+                
+                # 4. F ustuniga (6-ustun) CHEK ID sini yozamiz (agar yuborilgan bo'lsa)
+                if file_id:
+                    await asyncio.to_thread(ishchi_varaq.update_cell, row, 6, str(file_id))
+            else:
+                logging.warning(f"Jadvalda ID topilmadi: {user_id}")
                 
         except Exception as e:
-            logging.error(f"Jadvalni yangilashda xatolik (Mijoz topilmagan bo'lishi mumkin): {e}")
-
+            logging.error(f"Jadvalni yangilashda xatolik: {e}")
+            
 # --- STATES (HOLATLAR) ---
 class UserState(StatesGroup):
     waiting_for_name = State() 
@@ -488,6 +494,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
