@@ -68,9 +68,10 @@ async def save_to_sheet(user_id, ism, username):
             sana = toshkent_vaqti.strftime("%Y-%m-%d %H:%M:%S")
 
             # MUHIM O'ZGARISH: value_input_option="USER_ENTERED" qo'shildi
+            # MUHIM O'ZGARISH: A ustun bo'sh qolishi uchun boshiga "" qo'shildi
             await asyncio.to_thread(
                 ishchi_varaq.append_row, 
-                [sana, str(user_id), ism, f"@{username}"],
+                ["", sana, str(user_id), ism, f"@{username}"], 
                 value_input_option="USER_ENTERED"
             )
         except Exception as e:
@@ -80,20 +81,19 @@ async def save_to_sheet(user_id, ism, username):
 async def update_sheet(user_id, status, file_id=None):
     if ishchi_varaq:
         try:
-            # 1. B ustundagi (ID lar joylashgan) barcha ma'lumotlarni tortib olamiz
-            ids_list = await asyncio.to_thread(ishchi_varaq.col_values, 2)
+            # 1. MUHIM: Endi B emas, C ustundan (3-ustun) qidiramiz
+            ids_list = await asyncio.to_thread(ishchi_varaq.col_values, 3)
             
             str_uid = str(user_id)
             if str_uid in ids_list:
-                # 2. Ro'yxatni teskari qilib o'qiymiz va eng oxirgi kirgan ID qatorini topamiz
                 row = len(ids_list) - ids_list[::-1].index(str_uid)
                 
-                # 3. E ustuniga (5-ustun) STATUSni yozamiz
-                await asyncio.to_thread(ishchi_varaq.update_cell, row, 5, status)
+                # 2. MUHIM: Status endi E emas, F ustuniga (6-ustun) yoziladi
+                await asyncio.to_thread(ishchi_varaq.update_cell, row, 6, status)
                 
-                # 4. F ustuniga (6-ustun) CHEK ID sini yozamiz (agar yuborilgan bo'lsa)
+                # 3. MUHIM: Chek ID endi F emas, G ustuniga (7-ustun) yoziladi
                 if file_id:
-                    await asyncio.to_thread(ishchi_varaq.update_cell, row, 6, str(file_id))
+                    await asyncio.to_thread(ishchi_varaq.update_cell, row, 7, str(file_id))
             else:
                 logging.warning(f"Jadvalda ID topilmadi: {user_id}")
                 
@@ -169,22 +169,19 @@ async def cmd_admin_stats(message: types.Message):
         text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
 
         for qator in mijozlar:
-            # Qatorda yetarlicha ma'lumot borligini tekshiramiz (A, B, C, D ustunlar)
-            if len(qator) >= 4:
-                uid = qator[1]
-                ism = qator[2]
-                raw_username = qator[3]
+            # Endi A ustun bo'sh bo'lgani uchun jami 5 ta ustun tekshiriladi
+            if len(qator) >= 5:
+                uid = qator[2]           # C ustun (Indeks 2)
+                ism = qator[3]           # D ustun (Indeks 3)
+                raw_username = qator[4]  # E ustun (Indeks 4)
                 
-                # Username yo'qligini tekshiramiz
                 if raw_username and raw_username != "@Yashirin_profil":
                     nick_korsatkich = raw_username
                 else:
                     nick_korsatkich = "Profili yashirin"
                 
-                # HTML formatida qator yaratish (Link bilan)
                 yangi_qator = f"<a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n\n"
                 
-                # 5. Telegramning 4096 belgilik limitiga tushib qolmaslik uchun himoya
                 if len(text) + len(yangi_qator) > 4000:
                     text += "<i>...va yana boshqalar (Telegram xabar limitiga yetildi).</i>"
                     break
@@ -494,6 +491,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
