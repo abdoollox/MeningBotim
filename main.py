@@ -134,25 +134,30 @@ def rasm_yaratish(ism, shablon_turi="invite"):
 # --- ADMIN UCHUN: STATISTIKA ---
 @dp.message(Command("stats"))
 async def cmd_admin_stats(message: types.Message):
-    # 1-Cheklov: Faqat admin ishlata oladi
     if message.from_user.id != ADMIN_ID:
-        return # Boshqalar yozsa, bot jimgina e'tiborsiz qoldiradi
+        return
 
     total_users = len(USER_NAMES)
     
     if total_users == 0:
-        await message.reply("📉 Hozircha botdan hech kim foydalanmadi (yoki server yaqinda o'chib yongan).")
+        await message.reply("📉 Hozircha botdan hech kim foydalanmadi (yoki server yaqinda restart bo'lgan).")
         return
 
-    text = f"📊 **Umumiy foydalanuvchilar soni:** {total_users} ta\n\n"
-    text += "👤 **Foydalanganlar ro'yxati:**\n"
+    text = f"📊 <b>Umumiy foydalanuvchilar soni:</b> {total_users} ta\n\n"
+    text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
 
-    for uid, name in USER_NAMES.items():
-        qator = f"- {name} (ID: <code>{uid}</code>)\n"
+    for uid, data in USER_NAMES.items():
+        ism = data.get("ism", "Noma'lum")
+        raw_username = data.get("username")
         
-        # 2-Cheklov: Telegram xabar uzunligi limiti (4096) ga yetib qolmaslik uchun
+        # Agar mijozning username'i bo'lmasa, unga chiroyli nom beramiz
+        nick_korsatkich = f"@{raw_username}" if raw_username else "Profili yashirin"
+        
+        # HTML formatida link yaratish (tg://user?id=...)
+        qator = f"<a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n\n"
+        
         if len(text) + len(qator) > 4000:
-            text += "\n...va yana boshqalar (Limitga yetdi)."
+            text += "...va yana boshqalar (Telegram limitiga yetildi)."
             break
             
         text += qator
@@ -227,13 +232,13 @@ async def ask_name(callback: types.CallbackQuery, state: FSMContext):
 async def generate_invite(message: types.Message, state: FSMContext):
     ism = message.text
     user_id = message.from_user.id
-    username = message.from_user.username or "Yashirin_profil"
+    username = message.from_user.username
     
-    # Tezkor xotirada ham saqlaymiz (chipta yozish uchun kerak)
-    USER_NAMES[user_id] = ism 
+    # MUHIM O'ZGARISH: Ismni ham, usernameni ham lug'at ichida saqlaymiz
+    USER_NAMES[user_id] = {"ism": ism, "username": username}
     
-    # ⚡️ GOOGLE SHEETGA YOZAMIZ (Yangi qator):
-    await save_to_sheet(user_id, ism, username)
+    # ⚡️ GOOGLE SHEETGA YOZAMIZ:
+    await save_to_sheet(user_id, ism, username or "Yashirin_profil")
     
     # 1. Hayratlanish xabari
     await message.answer("Ko'zlarimga ishonolmayapman... 😯")
@@ -390,7 +395,7 @@ async def reject_payment(callback: types.CallbackQuery):
     except Exception as e: # <--- Eng oxirida bitta umumiy except hamma xatolikni ushlaydi
         await callback.message.answer(f"Xatolik: {e}")
         
-# --- 9-QADAM: ADMIN JAVOBI ---
+# --- 9-QADAM: ADMIN JAVOBI (TASDIQLASH VA CHIPTA BERISH) ---
 @dp.callback_query(F.data.startswith("confirm_"))
 async def confirm_payment(callback: types.CallbackQuery):
     try:
@@ -399,7 +404,11 @@ async def confirm_payment(callback: types.CallbackQuery):
         # ⚡️ GOOGLE SHEETNI YANGILASH: Tasdiqlandi
         await update_sheet(user_id, "To'landi ✅")
         
-        mijoz_ismi = USER_NAMES.get(user_id, "Talaba")
+        # MUHIM O'ZGARISH: Ismni yangi formatdan ajratib olamiz
+        foydalanuvchi = USER_NAMES.get(user_id, {})
+        mijoz_ismi = foydalanuvchi.get("ism", "Talaba")
+        
+        # 1. CHIPTA YARATISH (Ticket)
         chipta_rasmi = rasm_yaratish(mijoz_ismi, "ticket")
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
         stansiya_tugmasi = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🚂 Platforma 9 ¾ (Guruhga kirish)", url=link.invite_link)]])
@@ -451,6 +460,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
