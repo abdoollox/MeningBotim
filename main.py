@@ -157,10 +157,9 @@ async def cmd_admin_stats(message: types.Message):
     kutish_xabari = await message.reply("⏳ Goblinlar arxivni titkilashmoqda... Iltimos kuting.")
 
     try:
-        # 4. Barcha ma'lumotlarni fonda tortib kelamiz (Bot qotib qolmasligi uchun)
+        # 4. Barcha ma'lumotlarni fonda tortib kelamiz
         barcha_qatorlar = await asyncio.to_thread(ishchi_varaq.get_all_values)
         
-        # Agar jadvalda faqat 1-qator (sarlavhalar) bo'lsa yoki bom-bo'sh bo'lsa
         if len(barcha_qatorlar) <= 1:
             await kutish_xabari.edit_text("📉 Jadval hozircha bo'sh. Hech kim ro'yxatdan o'tmagan.")
             return
@@ -172,7 +171,7 @@ async def cmd_admin_stats(message: types.Message):
         text = f"📊 <b>Umumiy foydalanuvchilar soni:</b> {total_users} ta\n\n"
         text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
 
-      for qator in mijozlar:
+        for qator in mijozlar:
             if len(qator) >= 5:
                 uid = qator[2]           # C ustun (Telegram ID)
                 raw_username = qator[3]  # D ustun (Endi Username)
@@ -494,6 +493,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
