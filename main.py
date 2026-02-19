@@ -131,38 +131,66 @@ def rasm_yaratish(ism, shablon_turi="invite"):
         logging.error(f"Rasm chizishda xatolik: {e}")
         return None
 
-# --- ADMIN UCHUN: STATISTIKA ---
+# --- ADMIN UCHUN: STATISTIKA (GOOGLE SHEETS ORQALI) ---
 @dp.message(Command("stats"))
 async def cmd_admin_stats(message: types.Message):
+    # 1. Faqat admin ishlata olishi uchun himoya
     if message.from_user.id != ADMIN_ID:
         return
 
-    total_users = len(USER_NAMES)
-    
-    if total_users == 0:
-        await message.reply("📉 Hozircha botdan hech kim foydalanmadi (yoki server yaqinda restart bo'lgan).")
+    # 2. Agar jadval ulanmagan bo'lsa, xatolik beramiz
+    if not ishchi_varaq:
+        await message.reply("❌ Google Sheets ulanmagan. Baza bilan aloqa yo'q.")
         return
 
-    text = f"📊 <b>Umumiy foydalanuvchilar soni:</b> {total_users} ta\n\n"
-    text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
+    # 3. Kechikishni yopish uchun "Kutish xabari" yuboramiz
+    kutish_xabari = await message.reply("⏳ Goblinlar arxivni titkilashmoqda... Iltimos kuting.")
 
-    for uid, data in USER_NAMES.items():
-        ism = data.get("ism", "Noma'lum")
-        raw_username = data.get("username")
+    try:
+        # 4. Barcha ma'lumotlarni fonda tortib kelamiz (Bot qotib qolmasligi uchun)
+        barcha_qatorlar = await asyncio.to_thread(ishchi_varaq.get_all_values)
         
-        # Agar mijozning username'i bo'lmasa, unga chiroyli nom beramiz
-        nick_korsatkich = f"@{raw_username}" if raw_username else "Profili yashirin"
-        
-        # HTML formatida link yaratish (tg://user?id=...)
-        qator = f"<a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n\n"
-        
-        if len(text) + len(qator) > 4000:
-            text += "...va yana boshqalar (Telegram limitiga yetildi)."
-            break
-            
-        text += qator
+        # Agar jadvalda faqat 1-qator (sarlavhalar) bo'lsa yoki bom-bo'sh bo'lsa
+        if len(barcha_qatorlar) <= 1:
+            await kutish_xabari.edit_text("📉 Jadval hozircha bo'sh. Hech kim ro'yxatdan o'tmagan.")
+            return
 
-    await message.reply(text, parse_mode="HTML")
+        # Sarlavhani ro'yxatdan olib tashlaymiz
+        mijozlar = barcha_qatorlar[1:]
+        total_users = len(mijozlar)
+
+        text = f"📊 <b>Umumiy foydalanuvchilar soni:</b> {total_users} ta\n\n"
+        text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
+
+        for qator in mijozlar:
+            # Qatorda yetarlicha ma'lumot borligini tekshiramiz (A, B, C, D ustunlar)
+            if len(qator) >= 4:
+                uid = qator[1]
+                ism = qator[2]
+                raw_username = qator[3]
+                
+                # Username yo'qligini tekshiramiz
+                if raw_username and raw_username != "@Yashirin_profil":
+                    nick_korsatkich = raw_username
+                else:
+                    nick_korsatkich = "Profili yashirin"
+                
+                # HTML formatida qator yaratish (Link bilan)
+                yangi_qator = f"<a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n\n"
+                
+                # 5. Telegramning 4096 belgilik limitiga tushib qolmaslik uchun himoya
+                if len(text) + len(yangi_qator) > 4000:
+                    text += "<i>...va yana boshqalar (Telegram xabar limitiga yetildi).</i>"
+                    break
+                    
+                text += yangi_qator
+
+        # 6. Kutish xabarini tayyor ro'yxatga almashtiramiz
+        await kutish_xabari.edit_text(text, parse_mode="HTML")
+
+    except Exception as e:
+        logging.error(f"Statistika olishda xatolik: {e}")
+        await kutish_xabari.edit_text("❌ Bazadan ma'lumot olishda qandaydir xatolik yuz berdi.")
     
 # --- 1-QADAM: START ---
 @dp.message(Command("start"))
@@ -460,6 +488,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
