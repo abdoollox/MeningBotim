@@ -66,12 +66,16 @@ async def save_to_sheet(user_id, ism, username):
             toshkent_vaqti = datetime.utcnow() + timedelta(hours=5)
             sana = toshkent_vaqti.strftime("%Y-%m-%d %H:%M:%S")
 
-            # MUHIM O'ZGARISH: table_range="A1" qat'iy langar vazifasini bajaradi
+            # 1. B ustundagi (Sana) barcha yozuvlarni sanaymiz
+            b_ustun = await asyncio.to_thread(ishchi_varaq.col_values, 2)
+            yangi_qator_raqami = len(b_ustun) + 1 # Keyingi bo'sh qatorni aniqlaymiz
+
+            # 2. Hech qanday taxminlarsiz, aniq B, C, D, E ustunlarning bo'sh qatoriga yozamiz
             await asyncio.to_thread(
-                ishchi_varaq.append_row, 
-                ["", sana, str(user_id), ism, f"@{username}"],
-                value_input_option="USER_ENTERED",
-                table_range="A1"
+                ishchi_varaq.update, 
+                values=[[sana, str(user_id), ism, f"@{username}"]],
+                range_name=f"B{yangi_qator_raqami}:E{yangi_qator_raqami}",
+                value_input_option="USER_ENTERED"
             )
         except Exception as e:
             logging.error(f"Jadvalga yozishda xato: {e}")
@@ -490,6 +494,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
