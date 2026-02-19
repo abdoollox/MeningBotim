@@ -71,9 +71,10 @@ async def save_to_sheet(user_id, ism, username):
             yangi_qator_raqami = len(barcha_qatorlar) + 1
 
             # 2. Hech qanday taxminlarsiz, aniq manzillangan qatorga yozamiz
+          # MUHIM O'ZGARISH: Ism va Username o'rni almashdi
             await asyncio.to_thread(
                 ishchi_varaq.update, 
-                values=[[sana, str(user_id), ism, f"@{username}"]],
+                values=[[sana, str(user_id), f"@{username}", ism]], 
                 range_name=f"B{yangi_qator_raqami}:E{yangi_qator_raqami}",
                 value_input_option="USER_ENTERED"
             )
@@ -171,14 +172,13 @@ async def cmd_admin_stats(message: types.Message):
         text = f"📊 <b>Umumiy foydalanuvchilar soni:</b> {total_users} ta\n\n"
         text += "👤 <b>Foydalanganlar ro'yxati:</b>\n\n"
 
-        for qator in mijozlar:
-            # Endi A ustun bo'sh bo'lgani uchun jami 5 ta ustun tekshiriladi
+      for qator in mijozlar:
             if len(qator) >= 5:
-                uid = qator[2]           # C ustun (Indeks 2)
-                ism = qator[3]           # D ustun (Indeks 3)
-                raw_username = qator[4]  # E ustun (Indeks 4)
+                uid = qator[2]           # C ustun (Telegram ID)
+                raw_username = qator[3]  # D ustun (Endi Username)
+                ism = qator[4]           # E ustun (Endi Xat ism)
                 
-                if raw_username and raw_username != "@Yashirin_profil":
+                if raw_username and raw_username != "@@Yashirin_profil" and raw_username != "@Yashirin_profil":
                     nick_korsatkich = raw_username
                 else:
                     nick_korsatkich = "Profili yashirin"
@@ -494,6 +494,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
