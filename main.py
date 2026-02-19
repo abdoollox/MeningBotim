@@ -66,11 +66,11 @@ async def save_to_sheet(user_id, ism, username):
             toshkent_vaqti = datetime.utcnow() + timedelta(hours=5)
             sana = toshkent_vaqti.strftime("%Y-%m-%d %H:%M:%S")
 
-            # 1. B ustundagi (Sana) barcha yozuvlarni sanaymiz
-            b_ustun = await asyncio.to_thread(ishchi_varaq.col_values, 2)
-            yangi_qator_raqami = len(b_ustun) + 1 # Keyingi bo'sh qatorni aniqlaymiz
+            # 1. Butun jadvaldagi matnli qatorlarni sanaymiz (Eng ishonchli usul)
+            barcha_qatorlar = await asyncio.to_thread(ishchi_varaq.get_all_values)
+            yangi_qator_raqami = len(barcha_qatorlar) + 1
 
-            # 2. Hech qanday taxminlarsiz, aniq B, C, D, E ustunlarning bo'sh qatoriga yozamiz
+            # 2. Hech qanday taxminlarsiz, aniq manzillangan qatorga yozamiz
             await asyncio.to_thread(
                 ishchi_varaq.update, 
                 values=[[sana, str(user_id), ism, f"@{username}"]],
@@ -494,6 +494,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
