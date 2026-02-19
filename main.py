@@ -76,6 +76,24 @@ async def save_to_sheet(user_id, ism, username):
         except Exception as e:
             logging.error(f"Jadvalga yozishda xato: {e}")
 
+# --- JADVALNI YANGILASH FUNKSIYASI (STATUS VA CHEK UCHUN) ---
+async def update_sheet(user_id, status, file_id=None):
+    if ishchi_varaq:
+        try:
+            # 1. B ustundan (2-ustun) mijozning ID sini qidiramiz
+            cell = await asyncio.to_thread(ishchi_varaq.find, str(user_id), in_column=2)
+            row = cell.row
+            
+            # 2. E ustuniga (5-ustun) STATUSni yozamiz
+            await asyncio.to_thread(ishchi_varaq.update_cell, row, 5, status)
+            
+            # 3. F ustuniga (6-ustun) CHEK ID sini yozamiz (agar yuborilgan bo'lsa)
+            if file_id:
+                await asyncio.to_thread(ishchi_varaq.update_cell, row, 6, str(file_id))
+                
+        except Exception as e:
+            logging.error(f"Jadvalni yangilashda xatolik (Mijoz topilmagan bo'lishi mumkin): {e}")
+
 # --- STATES (HOLATLAR) ---
 class UserState(StatesGroup):
     waiting_for_name = State() 
@@ -320,31 +338,45 @@ async def handle_receipt(message: types.Message):
     ])
     caption_text = f"📩 **Yangi to'lov!**\n👤: {first_name}\nID: {user_id}"
     
+# Adminga yuborish va Mijozga javob qaytarish
     try:
+        # Fayl ID sini aniqlab olamiz
+        fayl_id = message.photo[-1].file_id if message.photo else message.document.file_id
+        
+        # 1. Adminga chekni yuboramiz
         if message.photo:
-            await bot.send_photo(chat_id=ADMIN_ID, photo=message.photo[-1].file_id, caption=caption_text, reply_markup=admin_tugma)
+            await bot.send_photo(chat_id=ADMIN_ID, photo=fayl_id, caption=caption_text, reply_markup=admin_tugma)
         elif message.document:
-            await bot.send_document(chat_id=ADMIN_ID, document=message.document.file_id, caption=caption_text, reply_markup=admin_tugma)
+            await bot.send_document(chat_id=ADMIN_ID, document=fayl_id, caption=caption_text, reply_markup=admin_tugma)
             
+        # ⚡️ GOOGLE SHEETNI YANGILASH: Status va Chek ID yoziladi
+        await update_sheet(user_id, "Tekshirilmoqda ⏳", fayl_id)
+        
+        # 2. Mijozga "Goblin tekshiryapti" degan rasm va matnni yuboramiz
         kutish_matni = (
             "🦉 Chek ukkilar tomonidan bankka yuborildi!\n\n"
-            
-            "🧐 Gringotts goblinlari to'lovni tekshirishni boshlashdi. Agar hammasi joyida bo'lsa, tez orada sizga Platforma 9¾ chiptasi yuboriladi.\n\n"
-            
+            "🧐 Gringotts goblinlari to'lovni tekshirishni boshlashdi.\n"
+            "👌 Agar hammasi joyida bo'lsa, tez orada sizga Platforma 9¾ chiptasi yuboriladi.\n\n"
             "⏳ Tekshirish vaqti: 10 daqiqadan 8 soatgacha.\n"
             "💯 Kutganingizdan ortiq qiymat olishingizga ishonamiz!"
-                       )
+        )
         try:
             await message.answer_photo(photo=GOBLIN_CHECK_ID, caption=kutish_matni, parse_mode="Markdown")
         except:
             await message.answer(kutish_matni, parse_mode="Markdown")
+        
     except Exception as e:
         await message.answer("Xatolik: Adminga yuborib bo'lmadi.")
 
 # --- 8-QADAM: RAD ETISH ---
 @dp.callback_query(F.data.startswith("reject_"))
 async def reject_payment(callback: types.CallbackQuery):
-    user_id = int(callback.data.split("_")[1])
+    try:
+        user_id = int(callback.data.split("_")[1])
+        
+        # ⚡️ GOOGLE SHEETNI YANGILASH: Rad etildi
+        await update_sheet(user_id, "Rad etildi ❌")
+        
     rad_matni = (
         "🚫 To'lov rad etildi!\n\n"
         
@@ -365,6 +397,10 @@ async def reject_payment(callback: types.CallbackQuery):
 async def confirm_payment(callback: types.CallbackQuery):
     try:
         user_id = int(callback.data.split("_")[1])
+        
+        # ⚡️ GOOGLE SHEETNI YANGILASH: Tasdiqlandi
+        await update_sheet(user_id, "To'landi ✅")
+        
         mijoz_ismi = USER_NAMES.get(user_id, "Talaba")
         chipta_rasmi = rasm_yaratish(mijoz_ismi, "ticket")
         link = await bot.create_chat_invite_link(chat_id=GURUH_ID, member_limit=1)
@@ -417,6 +453,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
