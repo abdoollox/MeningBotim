@@ -63,16 +63,15 @@ except Exception as e:
 async def save_to_sheet(user_id, ism, username):
     if ishchi_varaq:
         try:
-            # Server vaqtiga 5 soat qo'shib, qat'iy Toshkent vaqtini olamiz
             toshkent_vaqti = datetime.utcnow() + timedelta(hours=5)
             sana = toshkent_vaqti.strftime("%Y-%m-%d %H:%M:%S")
 
-            # MUHIM O'ZGARISH: value_input_option="USER_ENTERED" qo'shildi
-            # MUHIM O'ZGARISH: A ustun bo'sh qolishi uchun boshiga "" qo'shildi
+            # MUHIM O'ZGARISH: table_range="A1" qat'iy langar vazifasini bajaradi
             await asyncio.to_thread(
                 ishchi_varaq.append_row, 
-                ["", sana, str(user_id), ism, f"@{username}"], 
-                value_input_option="USER_ENTERED"
+                ["", sana, str(user_id), ism, f"@{username}"],
+                value_input_option="USER_ENTERED",
+                table_range="A1"
             )
         except Exception as e:
             logging.error(f"Jadvalga yozishda xato: {e}")
@@ -491,6 +490,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
