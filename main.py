@@ -182,7 +182,7 @@ async def cmd_admin_stats(message: types.Message):
                 else:
                     nick_korsatkich = "Profili yashirin"
                 
-                yangi_qator = f"<a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n\n"
+                yangi_qator = f"▪️ <a href='tg://user?id={uid}'>{nick_korsatkich}</a> - {ism}\n"
                 
                 if len(text) + len(yangi_qator) > 4000:
                     text += "<i>...va yana boshqalar (Telegram xabar limitiga yetildi).</i>"
@@ -493,6 +493,7 @@ if __name__ == "__main__":
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
         logging.error("Bot to'xtatildi!")
+
 
 
 
